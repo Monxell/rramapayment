@@ -1,7 +1,7 @@
 {
   "name": "payment-gateway-api",
-  "version": "1.0.0",
-  "description": "API Gateway for Telegram and WhatsApp Auto Order Bot",
+  "version": "1.0.1",
+  "description": "Payment Gateway API adapted for Vercel serverless deployment",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"

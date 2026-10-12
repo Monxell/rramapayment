@@ -1,0 +1,19 @@
+VERCEL DEPLOYMENT NOTES
+=======================
+
+1. Upload/push the contents of this folder to the repository connected to Vercel.
+2. In Vercel, use the project root that contains package.json and vercel.json.
+3. Framework Preset: Other. Build Command can be left empty; Install Command: npm install.
+4. Redeploy and inspect Runtime Logs if it still fails.
+5. Test:
+   - /
+   - /api/health
+   - /api/products
+   - /docs
+
+Important:
+- This patch adapts the Express app to Vercel's serverless entry point and resolves files using __dirname.
+- It does not verify that the third-party payment endpoint is authorized, reliable, or currently available.
+- Do not put API secrets in frontend JavaScript.
+- The existing upstream Origin/Referer headers were preserved from your original project; confirm with the seller that this integration is authorized.
+- Product prices are resolved server-side from products.json rather than trusted from the browser.
