@@ -1,0 +1,197 @@
+{
+  "products": {
+    "promo": [
+      {
+        "id": 642,
+        "code": "DANA10K",
+        "name": "10k",
+        "price": 10180,
+        "promo": true
+      },
+      {
+        "id": 643,
+        "code": "DANA20K",
+        "name": "20k",
+        "price": 20248,
+        "promo": true
+      },
+      {
+        "id": 644,
+        "code": "DANA25K",
+        "name": "25k",
+        "price": 25223,
+        "promo": true
+      },
+      {
+        "id": 982,
+        "code": "DANA30K",
+        "name": "30k",
+        "price": 30249,
+        "promo": true
+      },
+      {
+        "id": 5509,
+        "code": "DANA35K",
+        "name": "35k",
+        "price": 35300,
+        "promo": true
+      },
+      {
+        "id": 983,
+        "code": "DANA40K",
+        "name": "40k",
+        "price": 40237,
+        "promo": true
+      },
+      {
+        "id": 5512,
+        "code": "DANA45K",
+        "name": "45k",
+        "price": 45314,
+        "promo": true
+      },
+      {
+        "id": 645,
+        "code": "DANA50K",
+        "name": "50k",
+        "price": 50342,
+        "promo": true
+      },
+      {
+        "id": 5515,
+        "code": "DANA55K",
+        "name": "55k",
+        "price": 55326,
+        "promo": true
+      },
+      {
+        "id": 5518,
+        "code": "DANA60K",
+        "name": "60k",
+        "price": 60293,
+        "promo": true
+      },
+      {
+        "id": 5521,
+        "code": "DANA65K",
+        "name": "65k",
+        "price": 65340,
+        "promo": true
+      },
+      {
+        "id": 5524,
+        "code": "DANA70K",
+        "name": "70k",
+        "price": 70299,
+        "promo": true
+      },
+      {
+        "id": 984,
+        "code": "DANA75K",
+        "name": "75k",
+        "price": 75394,
+        "promo": true
+      },
+      {
+        "id": 5527,
+        "code": "DANA80K",
+        "name": "80k",
+        "price": 80394,
+        "promo": true
+      },
+      {
+        "id": 5530,
+        "code": "DANA85K",
+        "name": "85k",
+        "price": 85394,
+        "promo": true
+      },
+      {
+        "id": 5533,
+        "code": "DANA90K",
+        "name": "90k",
+        "price": 90426,
+        "promo": true
+      },
+      {
+        "id": 5536,
+        "code": "DANA95K",
+        "name": "95k",
+        "price": 95460,
+        "promo": true
+      },
+      {
+        "id": 646,
+        "code": "DANA100K",
+        "name": "100k",
+        "price": 100209,
+        "promo": true
+      },
+      {
+        "id": 649,
+        "code": "DANA150K",
+        "name": "150k",
+        "price": 150359,
+        "promo": true
+      },
+      {
+        "id": 647,
+        "code": "DANA200K",
+        "name": "200k",
+        "price": 200249,
+        "promo": true
+      }
+    ],
+    "non_promo": [
+      {
+        "id": 12423,
+        "code": "DANABF10",
+        "name": "10K",
+        "price": 10350,
+        "promo": false
+      },
+      {
+        "id": 12428,
+        "code": "DANABF20",
+        "name": "20K",
+        "price": 20425,
+        "promo": false
+      },
+      {
+        "id": 12433,
+        "code": "DANABF25",
+        "name": "25K",
+        "price": 25505,
+        "promo": false
+      },
+      {
+        "id": 12438,
+        "code": "DANABF30",
+        "name": "30K",
+        "price": 31105,
+        "promo": false
+      },
+      {
+        "id": 12443,
+        "code": "DANABF100",
+        "name": "100K",
+        "price": 100780,
+        "promo": false
+      },
+      {
+        "id": 12448,
+        "code": "DANABF150",
+        "name": "150K",
+        "price": 151005,
+        "promo": false
+      },
+      {
+        "id": 12453,
+        "code": "DANABF200",
+        "name": "200K",
+        "price": 201080,
+        "promo": false
+      }
+    ]
+  }
+}

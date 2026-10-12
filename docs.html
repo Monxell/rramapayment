@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway API Documentation</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+            --code-bg: #0f172a;
+            --code-text: #f8fafc;
+            --accent: #2563eb;
+            --warn-bg: #fffbeb;
+            --warn-border: #fef3c7;
+            --warn-text: #92400e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 24px 16px;
+        }
+
+        .wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .base-url {
+            display: inline-block;
+            margin-top: 12px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            background: #eff6ff;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        section {
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.015em;
+        }
+
+        h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 24px;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .method {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .get { background: #dbeafe; color: #1e40af; }
+        .post { background: #d1fae5; color: #065f46; }
+
+        .path {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .code-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 16px;
+            padding-top: 36px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #334155;
+            color: #f8fafc;
+            border: none;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            font-family: inherit;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #475569;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            margin-top: 16px;
+        }
+
+        .warning-box {
+            background: var(--warn-bg);
+            border: 1px solid var(--warn-border);
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            color: var(--warn-text);
+        }
+
+        .warning-box h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .warning-box ul {
+            margin-left: 20px;
+            font-size: 0.9rem;
+        }
+
+        .warning-box li {
+            margin-bottom: 6px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+            min-width: 500px;
+        }
+
+        th {
+            border-bottom: 2px solid var(--border-color);
+            padding: 8px 12px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        td {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 12px;
+            color: var(--text-muted);
+        }
+
+        td code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            background: #f1f5f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+
+        footer {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <header>
+            <h1>Payment Gateway API</h1>
+            <p>Dokumentasi integrasi layanan transaksi otomatis.</p>
+            <div class="base-url">Base URL: https://payment.warung-api.my.id</div>
+        </header>
+
+        <!-- PANDUAN PENCEGAHAN ERROR (PENTING AGAR TIDAK SALAH PAHAM) -->
+        <div class="warning-box">
+            <h4>Catatan Penting & Panduan Mencegah Kesalahan (Troubleshooting)</h4>
+            <ul>
+                <li><strong>order_id vs transaction_id:</strong> <code>order_id</code> (contoh: <code>3813354941</code>) hanya digunakan untuk nomor invoice/tampilan struk user. <strong>Jangan</strong> dipakai untuk mengecek status ke endpoint <code>/check-transaction</code> karena akan selalu menghasilkan status <code>PENDING</code>. Gunakan <code>transaction_id</code> (berawalan <code>pay_...</code>).</li>
+                <li><strong>Status Sukses:</strong> Respons status pembayaran yang valid dari server pusat adalah <code>SUCCESS</code> (bukan <code>PAID</code>). Pastikan bot/aplikasi Anda mendeteksi string <code>SUCCESS</code>.</li>
+                <li><strong>Nominal Harga Dinamis:</strong> Setiap metode pembayaran memiliki biaya unik masing-masing. Pastikan mengirim parameter <code>price</code> sesuai dengan harga spesifik metode yang dipilih (lihat daftar harga di bawah).</li>
+            </ul>
+        </div>
+
+        <section>
+            <h2>Endpoints</h2>
+
+            <h3>Get Products</h3>
+            <div class="endpoint-header">
+                <span class="method get">GET</span>
+                <span class="path">/api/products</span>
+            </div>
+            <p>Mendapatkan daftar produk yang tersedia, terbagi menjadi kategori promo dan non-promo beserta struktur harganya.</p>
+            
+            <div class="label">Request</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>curl -sS https://payment.warung-api.my.id/api/products</pre>
+            </div>
+
+            <div class="label">Response</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "success": true,
+  "data": {
+    "products": {
+      "promo": [
+        {"id": 642, "code": "DANA10K", "name": "10k", "price": 10180, "promo": true}
+      ],
+      "non_promo": [
+        {"id": 12423, "code": "DANABF10", "name": "10K", "price": 10350, "promo": false}
+      ]
+    }
+  }
+}</pre>
+            </div>
+
+            <hr>
+
+            <h3>Create Transaction</h3>
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="path">/api/create-transaction</span>
+            </div>
+            <p>Membuat transaksi baru dan menghasilkan QR code atau data pembayaran.</p>
+
+            <div class="label">Request Body</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "user_id": "08123456789",
+  "product_detail_id": 642,
+  "price": 10180,
+  "payment_method": "qris",
+  "customer_id": "",
+  "voucher_code": "",
+  "voucher_amount": 0,
+  "discounted_price": 0
+}</pre>
+            </div>
+
+            <div class="label">Response</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "success": true,
+  "data": {
+    "transaction_id": "pay_3eum1rJMqu3470",
+    "order_id": "3813354941",
+    "qr_code_url": "https://...",
+    "transaction_at": "2026-09-09 06:57:21"
+  }
+}</pre>
+            </div>
+
+            <hr>
+
+            <h3>Check Transaction</h3>
+            <div class="endpoint-header">
+                <span class="method post">POST</span>
+                <span class="path">/api/check-transaction</span>
+            </div>
+            <p>Mengecek status pembayaran transaksi secara berkala (polling) menggunakan <code>transaction_id</code>.</p>
+
+            <div class="label">Request Body</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "transaction_id": "pay_3eum1rJMqu3470"
+}</pre>
+            </div>
+
+            <div class="label">Response (Pending)</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "success": true,
+  "data": {
+    "status": "PENDING",
+    "paid_at": null
+  }
+}</pre>
+            </div>
+
+            <div class="label">Response (Success)</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>{
+  "success": true,
+  "data": {
+    "status": "SUCCESS",
+    "paid_at": "2026-09-09 06:57:21"
+  }
+}</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>LIST ID REQUEST HARGA & METODE PEMBAYARAN</h2>
+            
+            <div class="label">METODE PEMBAYARAN & KEY</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>1. qris -> "payment_method": "qris"
+2. gopay -> "payment_method": "gopay"
+3. shopee_pay -> "payment_method": "shopee_pay"
+4. va_bank_transfer -> "payment_method": "va_bank_transfer"
+5. alfamart -> "payment_method": "alfamart"
+6. card -> "payment_method": "card"</pre>
+            </div>
+
+            <div class="label">REFERENSI CODE ID & HARGA SPESIFIK</div>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>DANA10K: { id: 642, name: '10k', price: 10180, prices: { qris: 10252, gopay: 10384, shopee_pay: 10588, va_bank_transfer: 14580, alfamart: 15180, card: 12676 } },
+DANA20K: { id: 643, name: '20k', price: 20248, prices: { qris: 20390, gopay: 20653, shopee_pay: 21058, va_bank_transfer: 24648, alfamart: 25248, card: 23036 } },
+DANA25K: { id: 644, name: '25k', price: 25223, prices: { qris: 25400, gopay: 25728, shopee_pay: 26232, va_bank_transfer: 29623, alfamart: 30223, card: 28155 } },
+DANA30K: { id: 982, name: '30k', price: 30249, prices: { qris: 30461, gopay: 30854, shopee_pay: 31459, va_bank_transfer: 34649, alfamart: 35249, card: 33327 } },
+DANA35K: { id: 5509, name: '35k', price: 35300, prices: { qris: 35548, gopay: 36006, shopee_pay: 36712, va_bank_transfer: 39700, alfamart: 40300, card: 38524 } },
+DANA40K: { id: 983, name: '40k', price: 40237, prices: { qris: 40519, gopay: 41042, shopee_pay: 41847, va_bank_transfer: 44637, alfamart: 45237, card: 43604 } },
+DANA45K: { id: 5512, name: '45k', price: 45314, prices: { qris: 45632, gopay: 46221, shopee_pay: 47127, va_bank_transfer: 49714, alfamart: 50314, card: 48829 } },
+DANA50K: { id: 645, name: '50k', price: 50342, prices: { qris: 50695, gopay: 51349, shopee_pay: 52356, va_bank_transfer: 54742, alfamart: 55342, card: 54002 } },
+DANA55K: { id: 5515, name: '55k', price: 55326, prices: { qris: 55714, gopay: 56433, shopee_pay: 57540, va_bank_transfer: 59726, alfamart: 60326, card: 59131 } },
+DANA60K: { id: 5518, name: '60k', price: 60293, prices: { qris: 60716, gopay: 61499, shopee_pay: 62705, va_bank_transfer: 64693, alfamart: 65293, card: 64242 } },
+DANA65K: { id: 5521, name: '65k', price: 65340, prices: { qris: 65798, gopay: 66647, shopee_pay: 67954, va_bank_transfer: 69740, alfamart: 70340, card: 69435 } },
+DANA70K: { id: 5524, name: '70k', price: 70299, prices: { qris: 70792, gopay: 71705, shopee_pay: 73111, va_bank_transfer: 74699, alfamart: 75299, card: 74538 } },
+DANA75K: { id: 984, name: '75k', price: 75394, prices: { qris: 75922, gopay: 76902, shopee_pay: 78410, va_bank_transfer: 79794, alfamart: 80394, card: 79781 } },
+DANA80K: { id: 5527, name: '80k', price: 80394, prices: { qris: 80957, gopay: 82002, shopee_pay: 83610, va_bank_transfer: 84794, alfamart: 85394, card: 84926 } },
+DANA85K: { id: 5530, name: '85k', price: 85394, prices: { qris: 85992, gopay: 87102, shopee_pay: 88810, va_bank_transfer: 89794, alfamart: 90394, card: 90071 } },
+DANA90K: { id: 5533, name: '90k', price: 90426, prices: { qris: 91059, gopay: 92235, shopee_pay: 94044, va_bank_transfer: 94826, alfamart: 95426, card: 95249 } },
+DANA95K: { id: 5536, name: '95k', price: 95460, prices: { qris: 96129, gopay: 97370, shopee_pay: 99279, va_bank_transfer: 99860, alfamart: 100460, card: 100429 } },
+DANA100K: { id: 646, name: '100k', price: 100209, prices: { qris: 100911, gopay: 102214, shopee_pay: 104218, va_bank_transfer: 104609, alfamart: 105209, card: 105316 } },
+DANA150K: { id: 649, name: '150k', price: 150359, prices: { qris: 151412, gopay: 153367, shopee_pay: 156374, va_bank_transfer: 154759, alfamart: 155359, card: 156920 } },
+DANA200K: { id: 647, name: '200k', price: 200249, prices: { qris: 201651, gopay: 204254, shopee_pay: 208259, va_bank_transfer: 204649, alfamart: 205249, card: 208257 } },
+DANABF10: { id: 12423, name: '10K', price: 10350, prices: { qris: 10423, gopay: 10557, shopee_pay: 10764, va_bank_transfer: 14750, alfamart: 15350, card: 12851 } },
+DANABF20: { id: 12428, name: '20K', price: 20425, prices: { qris: 20568, gopay: 20834, shopee_pay: 21242, va_bank_transfer: 24825, alfamart: 25425, card: 23218 } },
+DANABF25: { id: 12433, name: '25K', price: 25505, prices: { qris: 25684, gopay: 26016, shopee_pay: 26526, va_bank_transfer: 29905, alfamart: 30505, card: 28445 } },
+DANABF30: { id: 12438, name: '30K', price: 31105, prices: { qris: 31323, gopay: 31728, shopee_pay: 32350, va_bank_transfer: 35505, alfamart: 36105, card: 34208 } },
+DANABF100: { id: 12443, name: '100K', price: 100780, prices: { qris: 101486, gopay: 102796, shopee_pay: 104812, va_bank_transfer: 105180, alfamart: 105780, card: 105903 } },
+DANABF150: { id: 12448, name: '150K', price: 151005, prices: { qris: 152063, gopay: 154026, shopee_pay: 157046, va_bank_transfer: 155405, alfamart: 156005, card: 157585 } },
+DANA200K: { id: 12453, name: '200K', price: 201080, prices: { qris: 202488, gopay: 205102, shopee_pay: 209124, va_bank_transfer: 205480, alfamart: 206080, card: 209112 } }</pre>
+            </div>
+        </section>
+
+        <section>
+            <h2>Parameters Reference</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>user_id</code></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>Nomor tujuan transaksi (contoh: 08123456789)</td>
+                        </tr>
+                        <tr>
+                            <td><code>product_detail_id</code></td>
+                            <td>Number</td>
+                            <td>Yes</td>
+                            <td>ID produk referensi dari endpoint /api/products</td>
+                        </tr>
+                        <tr>
+                            <td><code>price</code></td>
+                            <td>Number</td>
+                            <td>Yes</td>
+                            <td>Nominal harga produk spesifik metode pembayaran</td>
+                        </tr>
+                        <tr>
+                            <td><code>payment_method</code></td>
+                            <td>String</td>
+                            <td>No</td>
+                            <td>Metode pembayaran (default: qris)</td>
+                        </tr>
+                        <tr>
+                            <td><code>transaction_id</code></td>
+                            <td>String</td>
+                            <td>Yes</td>
+                            <td>ID unik berawalan <code>pay_...</code> dari create-transaction untuk cek status</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>Contoh Implementasi Fitur Bot WhatsApp</h2>
+            <p>Modul handler siap pakai yang sudah teruji dan mendeteksi status <code>SUCCESS</code> secara akurat:</p>
+            <div class="code-container">
+                <button class="copy-btn" onclick="copyCode(this)">Salin</button>
+                <pre>const axios = require("axios");
+
+const API_BASE_URL = "https://payment.warung-api.my.id/api";
+
+module.exports = {
+  name: "order",
+  category: "transaksi",
+  commands: ["order", "beli"],
+  handle: async ({ text, config, sock, from, fakeQuoted, msg }) => {
+
+    if (!text || text.trim() === "") {
+      return await sock.sendMessage(
+        from,
+        { text: `*Format Salah!*\n\nCara penggunaan:\n.order <KodeProduk> <NomorHP>\n\nContoh:\n.order DANA10K 08123456789` },
+        { quoted: fakeQuoted || msg }
+      );
+    }
+
+    let args = text.trim().split(/\s+/);
+    
+    if (args.length > 0 && (args[0].toLowerCase().includes("order") || args[0].toLowerCase().includes("beli"))) {
+      args.shift(); 
+    }
+
+    if (args.length < 2) {
+      return await sock.sendMessage(
+        from,
+        { text: `*Format Salah!*\nPastikan menyertakan Kode Produk dan Nomor HP.\nContoh: .order DANA10K 08123456789` },
+        { quoted: fakeQuoted || msg }
+      );
+    }
+
+    const kodeProduk = args[0].toUpperCase();
+    const nomorHp = args[1];
+
+    try {
+      await sock.sendMessage(from, { text: "⏳ Sedang mengecek produk..." }, { quoted: fakeQuoted || msg });
+      
+      const { data: productResponse } = await axios.get(`${API_BASE_URL}/products`);
+      
+      const promoList = productResponse.data.products.promo || [];
+      const nonPromoList = productResponse.data.products.non_promo || [];
+      const allProducts = [...promoList, ...nonPromoList];
+
+      const produk = allProducts.find((p) => p.code === kodeProduk);
+
+      if (!produk) {
+        return await sock.sendMessage(
+          from,
+          { text: `❌ Produk dengan kode *${kodeProduk}* tidak ditemukan.` },
+          { quoted: fakeQuoted || msg }
+        );
+      }
+
+      const payloadTransaction = {
+        user_id: nomorHp,
+        product_detail_id: produk.id,
+        price: produk.price,
+        payment_method: "qris",
+        customer_id: "",
+        voucher_code: "",
+        voucher_amount: 0,
+        discounted_price: 0
+      };
+
+      const { data: trxResponse } = await axios.post(`${API_BASE_URL}/create-transaction`, payloadTransaction);
+      
+      if (!trxResponse.success) throw new Error("Gagal generate QRIS");
+      
+      const { transaction_id, order_id, qr_code_url } = trxResponse.data;
+
+      const invoiceText = `🛒 *INVOICE PEMBAYARAN*\n\n` +
+                          `• Order ID : ${order_id}\n` +
+                          `• Produk : ${produk.name} (${produk.code})\n` +
+                          `• Tujuan : ${nomorHp}\n` +
+                          `• Total : *Rp ${produk.price.toLocaleString("id-ID")}*\n\n` +
+                          `Silakan scan QRIS di atas untuk melakukan pembayaran. Sistem akan otomatis mengecek pembayaranmu dalam 5 menit.`;
+
+      await sock.sendMessage(
+        from,
+        {
+          image: { url: qr_code_url }, 
+          caption: invoiceText
+        },
+        { quoted: fakeQuoted || msg }
+      );
+
+      let maxCheck = 30; 
+      let isPaid = false;
+
+      while (maxCheck > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+
+        try {
+          // PENTING: Wajib menggunakan transaction_id (pay_...)
+          const { data: checkResponse } = await axios.post(`${API_BASE_URL}/check-transaction`, {
+            transaction_id: transaction_id 
+          });
+
+          // PENTING: Status sukses dari API adalah SUCCESS (bukan PAID)
+          if (checkResponse.success && checkResponse.data.status === "SUCCESS") {
+            isPaid = true;
+            break;
+          }
+        } catch (err) {
+          console.error("Gagal cek status transaksi (retry):", err.message);
+        }
+
+        maxCheck--;
+      }
+
+      if (isPaid) {
+        const successText = `✅ *PEMBAYARAN BERHASIL*\n\nTerima kasih, pembayaran untuk Order ID *${order_id}* telah kami terima.\n\nPesanan *${produk.name}* ke nomor ${nomorHp} sedang diproses!`;
+        await sock.sendMessage(from, { text: successText }, { quoted: fakeQuoted || msg });
+      } else {
+        const timeoutText = `❌ *PEMBAYARAN EXPIRED*\n\nWaktu pembayaran untuk Order ID *${order_id}* telah habis (5 menit). Silakan buat pesanan baru.`;
+        await sock.sendMessage(from, { text: timeoutText }, { quoted: fakeQuoted || msg });
+      }
+
+    } catch (error) {
+      console.error("[Order Error]:", error?.response?.data || error.message);
+      return await sock.sendMessage(
+        from,
+        { text: `❌ Terjadi kesalahan pada server saat memproses pesananmu. Coba beberapa saat lagi.` },
+        { quoted: fakeQuoted || msg }
+      );
+    }
+  }
+};</pre>
+            </div>
+        </section>
+
+        <footer>
+            <p>&copy; ©DanxyOfficial - 2026 Payment Gateway API. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const pre = button.parentElement.querySelector('pre');
+            const text = pre.innerText;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    button.innerText = 'Berhasil disalin!';
+                    button.style.background = '#059669';
+                } else {
+                    button.innerText = 'Gagal!';
+                    button.style.background = '#dc2626';
+                }
+            } catch (err) {
+                console.error('Gagal menyalin teks: ', err);
+                button.innerText = 'Gagal!';
+                button.style.background = '#dc2626';
+            }
+
+            document.body.removeChild(textarea);
+
+            setTimeout(() => {
+                button.innerText = 'Salin';
+                button.style.background = '#334155';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
