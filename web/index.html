@@ -68,11 +68,6 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
   </header>
 
   <div id="formView" class="stack">
-    <div class="tabs">
-      <button class="tab on" id="tabDana">Top Up DANA</button>
-      <button class="tab" id="tabOwn">QRIS Langsung</button>
-    </div>
-
     <!-- MODE DANA -->
     <div id="danaForm" class="stack">
       <div class="card">
@@ -89,21 +84,8 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
       </div>
     </div>
 
-    <!-- MODE QRIS LANGSUNG -->
-    <div id="ownForm" class="stack" hidden>
-      <div class="card">
-        <label><span class="step">1</span>Nominal (min Rp 1.000)</label>
-        <div id="ownChips" class="grid" style="margin-bottom:14px"></div>
-        <input id="ownNom" type="text" inputmode="numeric" placeholder="contoh: 5.000">
-        <label class="chk"><input type="checkbox" id="openAmt">QRIS tanpa nominal (diisi di aplikasi pembayar)</label>
-        <div id="ownHint" class="hint"></div>
-      </div>
-    </div>
-
     <div class="card" id="sumCard" hidden>
       <div class="row"><span>Nominal</span><b id="sNom">-</b></div>
-      <div class="row"><span>Kode unik</span><b id="sUni">-</b></div>
-      <div class="row"><span>Biaya admin</span><b id="sAdm">Rp 0</b></div>
       <div class="row total"><span>Total bayar</span><b id="sTot">-</b></div>
       <div class="hint" id="sNote"></div>
     </div>
@@ -141,14 +123,12 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
   <p class="foot">Riwayat tersimpan di browser ini · gunakan Backup agar tidak hilang</p>
 </div></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const rp = n => 'Rp ' + Number(n).toLocaleString('id-ID');
-const POLL_MS = 8000, MAX_WAIT = 300000, KEY = 'qris_hist_v1', ADMIN_DANA = 0, MIN = 1000;
-const OWN_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
-let mode = 'dana', catalog = [], picked = null, own = { nominal: 0, cfg: null }, cur = null, pollT = null, tickT = null;
+const POLL_MS = 8000, MAX_WAIT = 300000, KEY = 'qris_hist_v1';
+let catalog = [], picked = null, cur = null, pollT = null, tickT = null;
 
 const loadH = () => { try { const a = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(a) ? a : []; } catch { return []; } };
 const saveH = h => { try { localStorage.setItem(KEY, JSON.stringify(h.slice(0, 500))); } catch {} };
@@ -162,33 +142,11 @@ async function api(path, body) {
 function emv(s) { const o = {}; let i = 0; while (i + 4 <= s.length) { const l = parseInt(s.substr(i + 2, 2), 10); if (!(l >= 0)) break; o[s.substr(i, 2)] = s.substr(i + 4, l); i += 4 + l; } return o; }
 const fmtNum = el => { const n = parseInt(el.value.replace(/\D/g, ''), 10) || 0; el.value = n ? n.toLocaleString('id-ID') : ''; return n; };
 
-/* ---------- mode ---------- */
-function setMode(m) {
-  mode = m; $('tabDana').classList.toggle('on', m === 'dana'); $('tabOwn').classList.toggle('on', m === 'own');
-  $('danaForm').hidden = m !== 'dana'; $('ownForm').hidden = m !== 'own'; $('formErr').textContent = '';
-  refresh();
-}
-$('tabDana').onclick = () => setMode('dana'); $('tabOwn').onclick = () => setMode('own');
-
 function refresh() {
-  const sc = $('sumCard'), note = $('sNote'); note.textContent = '';
-  if (mode === 'dana') {
-    sc.hidden = !picked; $('go').disabled = !(picked && normPhone($('phone').value));
-    if (picked) {
-      $('sNom').textContent = rp(picked.nominal); $('sUni').textContent = rp(picked.kode_unik);
-      $('sAdm').textContent = rp(ADMIN_DANA); $('sTot').textContent = rp(picked.price + ADMIN_DANA);
-      note.textContent = 'Perkiraan. Total final dibaca dari QR setelah dibuat.';
-    }
-  } else {
-    const cfg = own.cfg, open = $('openAmt').checked;
-    $('ownNom').disabled = open; $('ownChips').style.opacity = open ? .4 : 1;
-    if (!cfg || !cfg.configured) { sc.hidden = true; $('go').disabled = true; return; }
-    const ok = open || own.nominal >= MIN;
-    sc.hidden = open || !own.nominal;
-    $('sNom').textContent = rp(own.nominal); $('sUni').textContent = 'acak 1–199'; $('sAdm').textContent = rp(cfg.admin_fee);
-    $('sTot').textContent = rp(own.nominal + cfg.admin_fee) + ' + kode';
-    note.textContent = 'Kode unik diacak saat QR dibuat.';
-    $('go').disabled = !ok;
+  $('sumCard').hidden = !picked; $('go').disabled = !(picked && normPhone($('phone').value));
+  if (picked) {
+    $('sNom').textContent = rp(picked.nominal); $('sTot').textContent = 'Sesuai QR';
+    $('sNote').textContent = 'Total pasti muncul setelah QR dibuat, sama dengan yang tampil di aplikasi DANA.';
   }
 }
 
@@ -196,9 +154,6 @@ function refresh() {
 async function init() {
   try { catalog = (await api('/api/catalog')).data; drawChips(); }
   catch (e) { $('chips').innerHTML = '<div class="hint err" style="grid-column:1/-1">' + e.message + '</div>'; }
-  try { own.cfg = (await api('/api/qris/config')).data; } catch { own.cfg = { configured: false }; }
-  drawOwnChips();
-  if (!own.cfg.configured) { $('ownHint').className = 'hint err'; $('ownHint').textContent = 'QRIS merchant belum disetel. Isi env QRIS_STATIC di Vercel lalu redeploy.'; }
   renderH();
 }
 function chipBtn(label, on, fn) { const b = document.createElement('button'); b.className = 'chip'; b.textContent = label; b.onclick = fn; return b; }
@@ -210,11 +165,12 @@ function pick(p) { picked = p; document.querySelectorAll('#chips .chip').forEach
 $('custom').addEventListener('input', e => {
   const n = fmtNum(e.target), h = $('customHint'); h.className = 'hint';
   if (!n) { h.textContent = ''; return pick(null); }
+  if (n < 1000) { pick(null); h.className = 'hint err'; h.textContent = 'Minimal Rp 1.000.'; return; }
   const hit = catalog.find(p => p.nominal === n);
   if (hit) { h.textContent = 'Nominal tersedia ✓'; return pick(hit); }
   pick(null);
   const near = [...catalog].sort((a, b) => Math.abs(a.nominal - n) - Math.abs(b.nominal - n)).slice(0, 2).sort((a, b) => a.nominal - b.nominal);
-  h.className = 'hint err'; h.textContent = 'Nominal ini belum tersedia di Top Up DANA. Terdekat: ';
+  h.className = 'hint err'; h.textContent = 'Nominal ini belum tersedia. Terdekat: ';
   near.forEach((p, i) => {
     if (i) h.append(' atau ');
     const a = document.createElement('a'); a.href = '#'; a.style.color = 'inherit'; a.textContent = rp(p.nominal);
@@ -231,43 +187,20 @@ $('phone').addEventListener('input', () => {
   refresh();
 });
 
-/* ---------- QRIS langsung: input ---------- */
-function drawOwnChips() {
-  const box = $('ownChips'); box.innerHTML = '';
-  OWN_PRESETS.forEach(n => { const b = chipBtn(n >= 1000 ? n / 1000 + 'k' : n, 0, () => { own.nominal = n; $('ownNom').value = n.toLocaleString('id-ID'); ownMark(); refresh(); }); b.dataset.n = n; box.appendChild(b); });
-}
-function ownMark() { document.querySelectorAll('#ownChips .chip').forEach(c => c.classList.toggle('on', +c.dataset.n === own.nominal)); }
-$('ownNom').addEventListener('input', e => {
-  own.nominal = fmtNum(e.target); ownMark();
-  const h = $('ownHint');
-  if (own.cfg && own.cfg.configured) { h.className = own.nominal && own.nominal < MIN ? 'hint err' : 'hint'; h.textContent = own.nominal && own.nominal < MIN ? 'Minimal Rp 1.000.' : ''; }
-  refresh();
-});
-$('openAmt').onchange = refresh;
-
 /* ---------- generate ---------- */
 $('go').onclick = async () => {
   $('formErr').textContent = ''; $('go').disabled = true; $('go').innerHTML = '<span class="spin"></span>Membuat QRIS…';
   try {
-    if (mode === 'dana') {
-      const phone = normPhone($('phone').value);
-      const j = await api('/api/create-transaction', { user_id: phone, product_detail_id: picked.id, payment_method: 'qris' });
-      const d = j.data;
-      const t = { id: d.transaction_id, mode: 'dana', order: d.order_id, qrUrl: d.qr_code_url, nominal: picked.nominal, uniq: picked.kode_unik, admin: ADMIN_DANA, price: picked.price + ADMIN_DANA, phone, status: 'PENDING', t0: Date.now() };
-      upsertH(t); openTx(t);
-    } else {
-      const open = $('openAmt').checked;
-      const d = (await api('/api/qris', open ? { open: true } : { nominal: own.nominal })).data;
-      const t = { id: 'own_' + Date.now(), mode: 'own', open, payload: d.payload, merchant: d.merchant, nominal: d.nominal || 0, uniq: d.kode_unik || 0, admin: d.admin_fee || 0, price: d.total || 0, status: 'INFO', t0: Date.now() };
-      upsertH(t); openTx(t);
-    }
+    const phone = normPhone($('phone').value);
+    const d = (await api('/api/create-transaction', { user_id: phone, product_detail_id: picked.id, payment_method: 'qris' })).data;
+    const t = { id: d.transaction_id, mode: 'dana', order: d.order_id, qrUrl: d.qr_code_url, nominal: picked.nominal, price: 0, phone, status: 'PENDING', t0: Date.now() };
+    upsertH(t); openTx(t);
   } catch (e) { $('formErr').textContent = e.message; }
   $('go').textContent = 'Generate QRIS'; refresh();
 };
 
 /* ---------- pay view ---------- */
 function kindOf(t) {
-  if (t.mode === 'own') return 'info';
   const s = String(t.status || '').toUpperCase();
   if (['SUCCESS', 'PAID', 'SETTLED', 'COMPLETED', 'SETTLEMENT'].includes(s)) return 'success';
   if (['FAILED', 'EXPIRED', 'CANCELLED', 'CANCELED', 'ERROR', 'DENIED'].includes(s)) return 'fail';
@@ -282,47 +215,34 @@ function paint(t, note) {
   $('chk').hidden = k === 'info' || (k !== 'pending' && !note);
 }
 function showAmt(t) {
-  if (t.open) { $('pAmt').textContent = 'Nominal bebas'; $('pLabel').textContent = 'Isi nominal di aplikasi pembayar'; $('pInfo').textContent = t.merchant ? 'Ke: ' + t.merchant : ''; return; }
-  $('pLabel').textContent = 'Bayar tepat sesuai total';
-  $('pAmt').textContent = rp(t.price);
-  $('pInfo').textContent = 'Nominal ' + rp(t.nominal) + ' + kode unik ' + rp(t.uniq) + ' + admin ' + rp(t.admin || 0) +
-    (t.mode === 'dana' ? '\nDANA ' + t.phone + ' · Order ' + (t.order || '-') : (t.merchant ? '\nKe: ' + t.merchant : ''));
-}
-function drawQr(payload) {
-  if (typeof qrcode === 'undefined') throw new Error('Library QR gagal dimuat. Cek koneksi lalu coba lagi.');
-  const q = qrcode(0, 'M'); q.addData(payload); q.make();
-  const n = q.getModuleCount(), cell = Math.max(4, Math.floor(640 / (n + 8))), size = (n + 8) * cell;
-  const c = document.createElement('canvas'); c.width = c.height = size; const x = c.getContext('2d');
-  x.fillStyle = '#fff'; x.fillRect(0, 0, size, size); x.fillStyle = '#000';
-  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) x.fillRect((k + 4) * cell, (r + 4) * cell, cell, cell);
-  return c.toDataURL('image/png');
+  $('pLabel').textContent = 'Total bayar (sama dengan di aplikasi)';
+  $('pAmt').textContent = t.price ? rp(t.price) : 'Lihat di aplikasi';
+  $('pInfo').textContent = 'Top up ' + rp(t.nominal) + '\nDANA ' + t.phone + ' · Order ' + (t.order || '-');
 }
 function openTx(t) {
   stop(); cur = t;
   $('formView').hidden = true; $('payView').hidden = false; window.scrollTo(0, 0);
   $('qr').hidden = false; $('qrFail').hidden = true; $('pTimer').textContent = '';
   showAmt(t); paint(t);
-  if (t.mode === 'own') {
-    try { const u = drawQr(t.payload); $('qr').src = u; $('dl').href = u; $('dl').download = 'qris.png'; }
-    catch (e) { $('qr').hidden = true; $('qrFail').hidden = false; $('qrFail').textContent = e.message; }
-    $('pTimer').textContent = 'Status pembayaran dicek manual lewat notifikasi/mutasi merchant.';
-    return;
-  }
   const src = '/api/qr/' + encodeURIComponent(t.id);
   $('qr').src = src; $('dl').href = src; $('dl').download = 'qris.png';
   $('qrLink').href = /^https:\/\//.test(t.qrUrl || '') ? t.qrUrl : '#';
   if (kindOf(t) === 'pending') { check(); startPoll(t.t0 || Date.now()); }
 }
-$('qr').onerror = () => { if (cur && cur.mode === 'own') return; $('qr').hidden = true; $('qrFail').hidden = false; };
-// Baca nominal asli dari isi QR (tag 54) supaya total yang tampil sama dengan yang muncul di aplikasi bayar.
-$('qr').onload = () => {
-  const t = cur; if (!t || t.mode !== 'dana' || t.decoded) return;
+$('qr').onerror = () => { $('qr').hidden = true; $('qrFail').hidden = false; };
+// Baca nominal asli dari isi QR (tag 54) supaya total sama persis dengan yang muncul di aplikasi bayar.
+$('qr').onload = async () => {
+  const t = cur; if (!t || t.decoded) return;
+  const im = $('qr'); let text = null;
   try {
-    const im = $('qr'), c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
-    const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height);
-    const r = window.jsQR && jsQR(d.data, c.width, c.height); const a = r && parseFloat(emv(r.data)['54']);
-    if (a > 0) { t.decoded = true; t.price = Math.round(a); t.uniq = Math.max(0, t.price - t.nominal - (t.admin || 0)); upsertH(t); showAmt(t); }
+    const c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height);
+    const r = window.jsQR && jsQR(d.data, c.width, c.height); if (r) text = r.data;
+    if (!text && window.BarcodeDetector) { const b = await new BarcodeDetector({ formats: ['qr_code'] }).detect(c); if (b[0]) text = b[0].rawValue; }
   } catch {}
+  const a = text && parseFloat(emv(text)['54']);
+  if (cur === t && a > 0) { t.decoded = true; t.price = Math.round(a); upsertH(t); showAmt(t); }
 };
 function startPoll(t0) {
   const end = t0 + MAX_WAIT;
@@ -350,12 +270,12 @@ $('again').onclick = () => { stop(); cur = null; $('payView').hidden = true; $('
 
 /* ---------- history, backup, restore ---------- */
 function renderH() {
-  const h = loadH(), box = $('histList'); $('histCard').hidden = !h.length; $('histN').textContent = h.length; box.textContent = '';
+  const h = loadH().filter(t => t.mode !== 'own'), box = $('histList'); $('histCard').hidden = !h.length; $('histN').textContent = h.length; box.textContent = '';
   h.forEach(t => {
     const k = kindOf(t), b = document.createElement('button'); b.className = 'hist';
     const l = document.createElement('span'), s = document.createElement('b'), em = document.createElement('em');
-    s.textContent = t.mode === 'own' && t.open ? 'Tanpa nominal' : rp(t.price);
-    em.textContent = (t.mode === 'own' ? 'QRIS langsung' : 'DANA ' + (t.phone || '')) + ' · ' + new Date(t.t0 || 0).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+    s.textContent = rp(t.price || t.nominal);
+    em.textContent = 'DANA ' + (t.phone || '') + ' · ' + new Date(t.t0 || 0).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
     l.append(s, em);
     const bd = document.createElement('span'); bd.className = 'badge st-' + k; bd.textContent = { success: 'Berhasil', fail: 'Gagal', pending: 'Menunggu', info: 'QRIS' }[k];
     b.append(l, bd); b.onclick = () => openTx(t); box.appendChild(b);

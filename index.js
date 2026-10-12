@@ -2,7 +2,6 @@ const express = require('express');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 const app = express();
 app.use(express.json({ limit: '100kb' }));
@@ -53,7 +52,7 @@ app.get('/api', (req, res) => {
   res.json({
     success: true,
     message: 'Payment Gateway API is running',
-    endpoints: ['/api/products', '/api/catalog', '/api/create-transaction', '/api/check-transaction', '/api/qr/:id', '/api/qris', '/docs']
+    endpoints: ['/api/products', '/api/catalog', '/api/create-transaction', '/api/check-transaction', '/api/qr/:id', '/docs']
   });
 });
 
@@ -113,65 +112,6 @@ app.get('/api/qr/:id', async (req, res) => {
     console.error('Error fetching QR:', error.message);
     return res.status(502).json({ success: false, message: 'Failed to load QR image.' });
   }
-});
-
-// ---------- QRIS merchant sendiri (static -> dynamic) ----------
-// Isi env QRIS_STATIC di Vercel dengan teks QRIS statis merchant kamu (hasil scan stiker/QR QRIS).
-const QRIS_STATIC = (process.env.QRIS_STATIC || '').trim();
-const ADMIN_FEE = Math.max(0, parseInt(process.env.ADMIN_FEE || '0', 10) || 0);
-const QRIS_MIN = 1000, QRIS_MAX = 10000000;
-
-function crc16(str) {
-  let c = 0xFFFF;
-  for (let i = 0; i < str.length; i++) {
-    c ^= str.charCodeAt(i) << 8;
-    for (let j = 0; j < 8; j++) c = (c & 0x8000) ? ((c << 1) ^ 0x1021) : (c << 1);
-    c &= 0xFFFF;
-  }
-  return c.toString(16).toUpperCase().padStart(4, '0');
-}
-function tlv(str) {
-  const out = {};
-  let i = 0;
-  while (i + 4 <= str.length) {
-    const len = parseInt(str.substr(i + 2, 2), 10);
-    if (!(len >= 0)) break;
-    out[str.substr(i, 2)] = str.substr(i + 4, len);
-    i += 4 + len;
-  }
-  return out;
-}
-const qrisOk = /^000201/.test(QRIS_STATIC) && /6304[0-9A-Fa-f]{4}$/.test(QRIS_STATIC) &&
-  crc16(QRIS_STATIC.slice(0, -4)) === QRIS_STATIC.slice(-4).toUpperCase() &&
-  QRIS_STATIC.includes('5802ID') && !tlv(QRIS_STATIC)['54'];
-const merchantName = qrisOk ? (tlv(QRIS_STATIC)['59'] || '') : '';
-
-function qrisDynamic(total) {
-  const amt = String(total);
-  let s = QRIS_STATIC.slice(0, -4).replace('010211', '010212');
-  s = s.replace('5802ID', '54' + String(amt.length).padStart(2, '0') + amt + '5802ID');
-  return s + crc16(s);
-}
-
-app.get('/api/qris/config', (req, res) => {
-  res.json({ success: true, data: { configured: qrisOk, merchant: merchantName, admin_fee: ADMIN_FEE, min: QRIS_MIN, max: QRIS_MAX } });
-});
-
-app.post('/api/qris', rateLimit(30, 10 * 60 * 1000), (req, res) => {
-  if (!qrisOk) {
-    return res.status(503).json({ success: false, message: 'QRIS merchant belum disetel (env QRIS_STATIC kosong/tidak valid).' });
-  }
-  const body = req.body || {};
-  if (body.open === true) {
-    return res.json({ success: true, data: { payload: QRIS_STATIC, open: true, merchant: merchantName } });
-  }
-  const nominal = Number(body.nominal);
-  if (!Number.isInteger(nominal) || nominal < QRIS_MIN || nominal > QRIS_MAX) {
-    return res.status(400).json({ success: false, message: 'Nominal minimal Rp ' + QRIS_MIN.toLocaleString('id-ID') + '.' });
-  }
-  const kode = 1 + crypto.randomInt(199); // 1..199
-  const total = nominal + ADMIN_FEE + kode;
-  res.json({ success: true, data: { payload: qrisDynamic(total), nominal, kode_unik: kode, admin_fee: ADMIN_FEE, total, merchant: merchantName } });
 });
 
 app.get('/api/products', (req, res) => {
