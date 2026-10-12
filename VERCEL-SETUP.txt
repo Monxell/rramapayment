@@ -21,3 +21,9 @@ Important:
 Update 1.1.0:
 - / now serves the QRIS website (web/index.html). API info moved to /api.
 - New: /api/catalog, /api/qr/:id (QR image proxy). vercel.json includes web/** in the function bundle.
+
+Update 1.2.0 (mode QRIS langsung):
+- Env QRIS_STATIC = teks QRIS statis merchant kamu (scan QR stiker QRIS pakai scanner teks). Tanpa ini tab QRIS Langsung nonaktif.
+- Env ADMIN_FEE (opsional, default 0).
+- Kode unik acak 1-199 ditambahkan ke nominal; minimal nominal 1000.
+- Status bayar otomatis hanya ada di mode Top Up DANA.

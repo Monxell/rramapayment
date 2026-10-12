@@ -3,97 +3,120 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>QRIS Generator · Top Up DANA</title>
+<title>QRIS Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#FFF4E0;--ink:#1E1B2E;--card:#fff;--lav:#CDBBFF;--mint:#B6F0CF;--peach:#FFCBA8;--yel:#FFE48A;--pink:#FFB7D0;--sh:4px 4px 0 var(--ink)}
+:root{--bg:#FFF4E0;--ink:#1E1B2E;--lav:#CDBBFF;--mint:#B6F0CF;--peach:#FFCBA8;--yel:#FFE48A;--pink:#FFB7D0;--sh:4px 4px 0 var(--ink)}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:18px 14px 40px;background-image:radial-gradient(var(--ink) 1px,transparent 1px);background-size:22px 22px;background-position:0 0}
-.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-.card{background:var(--card);border:2.5px solid var(--ink);border-radius:20px;box-shadow:var(--sh);padding:16px}
+html,body{width:100%}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px 12px 40px;background-image:radial-gradient(var(--ink) 1px,transparent 1px);background-size:22px 22px}
+.wrap{width:100%;max-width:560px;margin:0 auto}
+.stack{display:flex;flex-direction:column;gap:14px;width:100%}
+.card{width:100%;background:#fff;border:2.5px solid var(--ink);border-radius:20px;box-shadow:var(--sh);padding:16px}
 h1{font-size:26px;line-height:1.1}
-.tag{display:inline-block;background:var(--lav);border:2px solid var(--ink);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:8px}
+.tag{display:inline-block;background:#fff;border:2px solid var(--ink);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:8px}
 .sub{font-size:14px;margin-top:6px;opacity:.8}
 label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
 .step{display:inline-grid;place-items:center;width:24px;height:24px;border:2px solid var(--ink);border-radius:8px;background:var(--yel);font-size:13px;margin-right:6px}
-input{width:100%;font:inherit;font-weight:700;font-size:17px;padding:12px 14px;border:2.5px solid var(--ink);border-radius:14px;background:#fff;outline:none;box-shadow:3px 3px 0 var(--ink)}
-input:focus{background:#FFFBEF}
+input[type=text],input[type=tel]{width:100%;font:inherit;font-weight:700;font-size:17px;padding:12px 14px;border:2.5px solid var(--ink);border-radius:14px;background:#fff;outline:none;box-shadow:3px 3px 0 var(--ink)}
+input:focus{background:#FFFBEF}input:disabled{opacity:.45}
 .hint{font-size:12.5px;margin-top:8px;min-height:16px}
 .hint.err{color:#B3123F;font-weight:700}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.chip{font:inherit;font-weight:700;font-size:15px;padding:10px 4px 8px;border:2.5px solid var(--ink);border-radius:14px;background:var(--peach);box-shadow:3px 3px 0 var(--ink);cursor:pointer;text-align:center;line-height:1.2;color:var(--ink);transition:transform .08s,box-shadow .08s}
-.chip small{display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px}
-.chip.low small{opacity:1;font-weight:700}
-.chip:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
-.chip.on{background:var(--lav);transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tab{font:inherit;font-weight:700;font-size:15px;padding:11px 6px;border:2.5px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink)}
+.tab.on{background:var(--yel);transform:translate(3px,3px);box-shadow:none}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chip{font:inherit;font-weight:700;font-size:15px;padding:12px 2px;border:2.5px solid var(--ink);border-radius:14px;background:var(--peach);box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);transition:transform .08s,box-shadow .08s}
+.chip:active,.chip.on{transform:translate(3px,3px);box-shadow:none}
+.chip.on{background:var(--lav)}
 .row{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:6px 0}
-.row b{font-family:'Space Mono',monospace}
+.row b{font-family:'Space Mono',monospace;text-align:right}
 .total{border-top:2.5px dashed var(--ink);margin-top:6px;padding-top:12px;font-size:17px}
-.total b{font-size:22px}
+.total b{font-size:21px}
 .btn{width:100%;font:inherit;font-weight:700;font-size:17px;padding:14px;border:2.5px solid var(--ink);border-radius:16px;background:var(--mint);box-shadow:var(--sh);cursor:pointer;color:var(--ink);transition:transform .08s,box-shadow .08s;text-align:center;text-decoration:none;display:block}
-.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn:active{transform:translate(4px,4px);box-shadow:none}
 .btn:disabled{opacity:.5;pointer-events:none}
-.btn.alt{background:#fff;font-size:15px;padding:11px;box-shadow:3px 3px 0 var(--ink)}
+.btn.alt{background:#fff;font-size:14px;padding:11px;box-shadow:3px 3px 0 var(--ink)}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .badge{display:inline-block;border:2.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700;font-size:15px}
-.st-pending{background:var(--yel)}.st-success{background:var(--mint)}.st-fail{background:var(--pink)}
+.st-pending{background:var(--yel)}.st-success{background:var(--mint)}.st-fail{background:var(--pink)}.st-info{background:var(--lav)}
 .center{text-align:center}
-.qr{width:100%;max-width:290px;aspect-ratio:1;object-fit:contain;margin:14px auto;display:block;background:#fff;border:2.5px solid var(--ink);border-radius:18px;padding:8px}
-.amount{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;margin-top:10px}
-.meta{font-size:12.5px;opacity:.75;margin-top:6px;word-break:break-all}
+.qr{width:100%;max-width:320px;aspect-ratio:1;object-fit:contain;margin:14px auto;display:block;background:#fff;border:2.5px solid var(--ink);border-radius:18px;padding:8px;image-rendering:pixelated}
+.amount{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;margin-top:8px}
+.meta{font-size:13px;opacity:.8;margin-top:8px;word-break:break-all;white-space:pre-line}
+.chk{display:flex;gap:10px;align-items:center;font-weight:700;font-size:14px;margin-top:14px;cursor:pointer}
+.chk input{width:22px;height:22px;accent-color:var(--ink)}
 .hist{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;font:inherit;text-align:left;border:2px solid var(--ink);border-radius:12px;background:#fff;padding:9px 12px;margin-top:8px;cursor:pointer;color:var(--ink)}
-.hist .badge{padding:2px 10px;font-size:12px;border-width:2px}
-.hist span:first-child{font-size:14px}
+.hist .badge{padding:2px 10px;font-size:12px;border-width:2px;white-space:nowrap}
 .hist em{display:block;font-style:normal;font-size:11.5px;opacity:.65}
+#histList{max-height:340px;overflow-y:auto;padding:2px 4px 4px 2px}
 .spin{display:inline-block;width:14px;height:14px;border:3px solid var(--ink);border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes s{to{transform:rotate(360deg)}}
 .pop{animation:p .35s cubic-bezier(.3,1.6,.5,1)}
 @keyframes p{from{transform:scale(.6);opacity:0}}
 [hidden]{display:none!important}
-.foot{font-size:12px;text-align:center;opacity:.7}
+.foot{font-size:12px;text-align:center;opacity:.7;margin-top:14px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap"><div class="stack">
 
   <header class="card" style="background:var(--lav)">
-    <span class="tag" style="background:#fff">QRIS · TOP UP DANA</span>
+    <span class="tag">QRIS GENERATOR</span>
     <h1>Generate QRIS<br>langsung bayar.</h1>
-    <p class="sub">Pilih nominal, scan, selesai. Tanpa login, tanpa admin.</p>
+    <p class="sub">Pilih nominal, scan, selesai. Tanpa login.</p>
   </header>
 
-  <!-- FORM -->
-  <section id="formView" class="wrap" style="gap:16px">
-    <div class="card">
-      <label><span class="step">1</span>Nomor DANA tujuan</label>
-      <input id="phone" type="tel" inputmode="numeric" placeholder="08xxxxxxxxxx" autocomplete="tel" maxlength="16">
-      <div id="phoneHint" class="hint">Saldo DANA akan masuk ke nomor ini.</div>
+  <div id="formView" class="stack">
+    <div class="tabs">
+      <button class="tab on" id="tabDana">Top Up DANA</button>
+      <button class="tab" id="tabOwn">QRIS Langsung</button>
     </div>
 
-    <div class="card">
-      <label><span class="step">2</span>Pilih nominal</label>
-      <div id="chips" class="grid"><div class="hint" style="grid-column:1/-1"><span class="spin"></span>Memuat nominal…</div></div>
-      <label style="margin-top:16px">Atau nominal custom</label>
-      <input id="custom" type="text" inputmode="numeric" placeholder="contoh: 10.000">
-      <div id="customHint" class="hint"></div>
+    <!-- MODE DANA -->
+    <div id="danaForm" class="stack">
+      <div class="card">
+        <label><span class="step">1</span>Nomor DANA tujuan</label>
+        <input id="phone" type="tel" inputmode="numeric" placeholder="08xxxxxxxxxx" autocomplete="tel" maxlength="16">
+        <div id="phoneHint" class="hint">Saldo DANA akan masuk ke nomor ini.</div>
+      </div>
+      <div class="card">
+        <label><span class="step">2</span>Pilih nominal</label>
+        <div id="chips" class="grid"><div class="hint" style="grid-column:1/-1"><span class="spin"></span>Memuat…</div></div>
+        <label style="margin-top:16px">Atau nominal custom</label>
+        <input id="custom" type="text" inputmode="numeric" placeholder="contoh: 10.000">
+        <div id="customHint" class="hint"></div>
+      </div>
+    </div>
+
+    <!-- MODE QRIS LANGSUNG -->
+    <div id="ownForm" class="stack" hidden>
+      <div class="card">
+        <label><span class="step">1</span>Nominal (min Rp 1.000)</label>
+        <div id="ownChips" class="grid" style="margin-bottom:14px"></div>
+        <input id="ownNom" type="text" inputmode="numeric" placeholder="contoh: 5.000">
+        <label class="chk"><input type="checkbox" id="openAmt">QRIS tanpa nominal (diisi di aplikasi pembayar)</label>
+        <div id="ownHint" class="hint"></div>
+      </div>
     </div>
 
     <div class="card" id="sumCard" hidden>
       <div class="row"><span>Nominal</span><b id="sNom">-</b></div>
       <div class="row"><span>Kode unik</span><b id="sUni">-</b></div>
+      <div class="row"><span>Biaya admin</span><b id="sAdm">Rp 0</b></div>
       <div class="row total"><span>Total bayar</span><b id="sTot">-</b></div>
+      <div class="hint" id="sNote"></div>
     </div>
 
     <button id="go" class="btn" disabled>Generate QRIS</button>
     <div id="formErr" class="hint err center"></div>
-  </section>
+  </div>
 
-  <!-- RESULT -->
   <section id="payView" class="card center" hidden>
     <span id="stBadge" class="badge st-pending"></span>
     <img id="qr" class="qr" alt="QRIS">
     <div id="qrFail" class="hint err" hidden>Gambar QR gagal dimuat. <a id="qrLink" target="_blank" rel="noopener">Buka QR langsung</a></div>
-    <div class="hint">Bayar tepat sesuai total</div>
+    <div id="pLabel" class="hint">Bayar tepat sesuai total</div>
     <div id="pAmt" class="amount">-</div>
     <div id="pInfo" class="meta"></div>
     <div id="pTimer" class="meta"></div>
@@ -105,128 +128,202 @@ input:focus{background:#FFFBEF}
   </section>
 
   <section id="histCard" class="card" hidden>
-    <label style="margin-bottom:0">Riwayat terakhir</label>
+    <label>Riwayat (<span id="histN">0</span>)</label>
+    <div class="btns" style="margin:0 0 6px">
+      <button class="btn alt" id="bk">⬇ Backup</button>
+      <button class="btn alt" id="rsBtn">⬆ Restore</button>
+    </div>
+    <input type="file" id="rs" accept="application/json,.json" hidden>
+    <div id="histNote" class="hint"></div>
     <div id="histList"></div>
   </section>
 
-  <p class="foot">Top up saldo DANA via QRIS · bayar sesuai total agar terdeteksi</p>
-</div>
+  <p class="foot">Riwayat tersimpan di browser ini · gunakan Backup agar tidak hilang</p>
+</div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const rp = n => 'Rp ' + Number(n).toLocaleString('id-ID');
-const POLL_MS = 8000, MAX_WAIT = 5 * 60 * 1000, KEY = 'qris_hist_v1';
-let catalog = [], picked = null, cur = null, pollT = null, tickT = null;
+const POLL_MS = 8000, MAX_WAIT = 300000, KEY = 'qris_hist_v1', ADMIN_DANA = 0, MIN = 1000;
+const OWN_PRESETS = [1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
+let mode = 'dana', catalog = [], picked = null, own = { nominal: 0, cfg: null }, cur = null, pollT = null, tickT = null;
 
-/* ---------- storage ---------- */
-const loadH = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
-const saveH = h => { try { localStorage.setItem(KEY, JSON.stringify(h.slice(0, 5))); } catch {} };
+const loadH = () => { try { const a = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(a) ? a : []; } catch { return []; } };
+const saveH = h => { try { localStorage.setItem(KEY, JSON.stringify(h.slice(0, 500))); } catch {} };
 function upsertH(t) { const h = loadH().filter(x => x.id !== t.id); h.unshift(t); saveH(h); renderH(); }
-
-/* ---------- api ---------- */
 async function api(path, body) {
   const r = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
   const j = await r.json().catch(() => ({}));
   if (!r.ok || !j.success) throw new Error(j.message || 'Terjadi kesalahan. Coba lagi.');
   return j;
 }
+function emv(s) { const o = {}; let i = 0; while (i + 4 <= s.length) { const l = parseInt(s.substr(i + 2, 2), 10); if (!(l >= 0)) break; o[s.substr(i, 2)] = s.substr(i + 4, l); i += 4 + l; } return o; }
+const fmtNum = el => { const n = parseInt(el.value.replace(/\D/g, ''), 10) || 0; el.value = n ? n.toLocaleString('id-ID') : ''; return n; };
 
-/* ---------- catalog / chips ---------- */
+/* ---------- mode ---------- */
+function setMode(m) {
+  mode = m; $('tabDana').classList.toggle('on', m === 'dana'); $('tabOwn').classList.toggle('on', m === 'own');
+  $('danaForm').hidden = m !== 'dana'; $('ownForm').hidden = m !== 'own'; $('formErr').textContent = '';
+  refresh();
+}
+$('tabDana').onclick = () => setMode('dana'); $('tabOwn').onclick = () => setMode('own');
+
+function refresh() {
+  const sc = $('sumCard'), note = $('sNote'); note.textContent = '';
+  if (mode === 'dana') {
+    sc.hidden = !picked; $('go').disabled = !(picked && normPhone($('phone').value));
+    if (picked) {
+      $('sNom').textContent = rp(picked.nominal); $('sUni').textContent = rp(picked.kode_unik);
+      $('sAdm').textContent = rp(ADMIN_DANA); $('sTot').textContent = rp(picked.price + ADMIN_DANA);
+      note.textContent = 'Perkiraan. Total final dibaca dari QR setelah dibuat.';
+    }
+  } else {
+    const cfg = own.cfg, open = $('openAmt').checked;
+    $('ownNom').disabled = open; $('ownChips').style.opacity = open ? .4 : 1;
+    if (!cfg || !cfg.configured) { sc.hidden = true; $('go').disabled = true; return; }
+    const ok = open || own.nominal >= MIN;
+    sc.hidden = open || !own.nominal;
+    $('sNom').textContent = rp(own.nominal); $('sUni').textContent = 'acak 1–199'; $('sAdm').textContent = rp(cfg.admin_fee);
+    $('sTot').textContent = rp(own.nominal + cfg.admin_fee) + ' + kode';
+    note.textContent = 'Kode unik diacak saat QR dibuat.';
+    $('go').disabled = !ok;
+  }
+}
+
+/* ---------- DANA: catalog, custom, phone ---------- */
 async function init() {
   try { catalog = (await api('/api/catalog')).data; drawChips(); }
   catch (e) { $('chips').innerHTML = '<div class="hint err" style="grid-column:1/-1">' + e.message + '</div>'; }
+  try { own.cfg = (await api('/api/qris/config')).data; } catch { own.cfg = { configured: false }; }
+  drawOwnChips();
+  if (!own.cfg.configured) { $('ownHint').className = 'hint err'; $('ownHint').textContent = 'QRIS merchant belum disetel. Isi env QRIS_STATIC di Vercel lalu redeploy.'; }
   renderH();
 }
+function chipBtn(label, on, fn) { const b = document.createElement('button'); b.className = 'chip'; b.textContent = label; b.onclick = fn; return b; }
 function drawChips() {
   $('chips').innerHTML = '';
-  catalog.forEach(p => {
-    const b = document.createElement('button');
-    b.className = 'chip' + (p.kode_unik < 200 ? ' low' : '');
-    b.dataset.id = p.id;
-    b.innerHTML = (p.nominal / 1000) + 'k<small>+' + p.kode_unik + '</small>';
-    b.onclick = () => { $('custom').value = ''; $('customHint').textContent = ''; pick(p); };
-    $('chips').appendChild(b);
-  });
+  catalog.forEach(p => { const b = chipBtn(p.nominal / 1000 + 'k', 0, () => { $('custom').value = ''; $('customHint').textContent = ''; pick(p); }); b.dataset.id = p.id; $('chips').appendChild(b); });
 }
-function pick(p) {
-  picked = p;
-  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', p && Number(c.dataset.id) === p.id));
-  $('sumCard').hidden = !p;
-  if (p) { $('sNom').textContent = rp(p.nominal); $('sUni').textContent = rp(p.kode_unik); $('sTot').textContent = rp(p.price); }
-  validate();
-}
-
-/* ---------- custom nominal ---------- */
+function pick(p) { picked = p; document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('on', !!p && +c.dataset.id === p.id)); refresh(); }
 $('custom').addEventListener('input', e => {
-  const n = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
-  e.target.value = n ? n.toLocaleString('id-ID') : '';
-  const h = $('customHint'); h.className = 'hint';
+  const n = fmtNum(e.target), h = $('customHint'); h.className = 'hint';
   if (!n) { h.textContent = ''; return pick(null); }
   const hit = catalog.find(p => p.nominal === n);
   if (hit) { h.textContent = 'Nominal tersedia ✓'; return pick(hit); }
   pick(null);
   const near = [...catalog].sort((a, b) => Math.abs(a.nominal - n) - Math.abs(b.nominal - n)).slice(0, 2).sort((a, b) => a.nominal - b.nominal);
-  h.className = 'hint err';
-  h.innerHTML = 'Nominal ini belum tersedia. Terdekat: ' + near.map(p => '<a href="#" data-n="' + p.nominal + '" style="color:inherit">' + rp(p.nominal) + '</a>').join(' atau ');
-  h.querySelectorAll('a').forEach(a => a.onclick = ev => {
-    ev.preventDefault(); const p = catalog.find(x => x.nominal === +a.dataset.n);
-    $('custom').value = p.nominal.toLocaleString('id-ID'); h.className = 'hint'; h.textContent = 'Nominal tersedia ✓'; pick(p);
+  h.className = 'hint err'; h.textContent = 'Nominal ini belum tersedia di Top Up DANA. Terdekat: ';
+  near.forEach((p, i) => {
+    if (i) h.append(' atau ');
+    const a = document.createElement('a'); a.href = '#'; a.style.color = 'inherit'; a.textContent = rp(p.nominal);
+    a.onclick = ev => { ev.preventDefault(); $('custom').value = p.nominal.toLocaleString('id-ID'); h.className = 'hint'; h.textContent = 'Nominal tersedia ✓'; pick(p); };
+    h.append(a);
   });
 });
-
-/* ---------- phone ---------- */
-function normPhone(v) {
-  let d = v.replace(/\D/g, '');
-  if (d.startsWith('62')) d = '0' + d.slice(2);
-  return /^08\d{8,12}$/.test(d) ? d : null;
-}
+function normPhone(v) { let d = v.replace(/\D/g, ''); if (d.startsWith('62')) d = '0' + d.slice(2); return /^08\d{8,12}$/.test(d) ? d : null; }
 $('phone').addEventListener('input', () => {
   const v = $('phone').value, h = $('phoneHint');
   if (!v) { h.className = 'hint'; h.textContent = 'Saldo DANA akan masuk ke nomor ini.'; }
   else if (normPhone(v)) { h.className = 'hint'; h.textContent = 'Nomor valid ✓'; }
   else { h.className = 'hint err'; h.textContent = 'Format nomor belum benar (contoh 08123456789).'; }
-  validate();
+  refresh();
 });
-const validate = () => { $('go').disabled = !(picked && normPhone($('phone').value)); };
 
-/* ---------- create ---------- */
+/* ---------- QRIS langsung: input ---------- */
+function drawOwnChips() {
+  const box = $('ownChips'); box.innerHTML = '';
+  OWN_PRESETS.forEach(n => { const b = chipBtn(n >= 1000 ? n / 1000 + 'k' : n, 0, () => { own.nominal = n; $('ownNom').value = n.toLocaleString('id-ID'); ownMark(); refresh(); }); b.dataset.n = n; box.appendChild(b); });
+}
+function ownMark() { document.querySelectorAll('#ownChips .chip').forEach(c => c.classList.toggle('on', +c.dataset.n === own.nominal)); }
+$('ownNom').addEventListener('input', e => {
+  own.nominal = fmtNum(e.target); ownMark();
+  const h = $('ownHint');
+  if (own.cfg && own.cfg.configured) { h.className = own.nominal && own.nominal < MIN ? 'hint err' : 'hint'; h.textContent = own.nominal && own.nominal < MIN ? 'Minimal Rp 1.000.' : ''; }
+  refresh();
+});
+$('openAmt').onchange = refresh;
+
+/* ---------- generate ---------- */
 $('go').onclick = async () => {
   $('formErr').textContent = ''; $('go').disabled = true; $('go').innerHTML = '<span class="spin"></span>Membuat QRIS…';
   try {
-    const phone = normPhone($('phone').value);
-    const j = await api('/api/create-transaction', { user_id: phone, product_detail_id: picked.id, payment_method: 'qris' });
-    const d = j.data;
-    const t = { id: d.transaction_id, order: d.order_id, qrUrl: d.qr_code_url, nominal: picked.nominal, uniq: picked.kode_unik, price: picked.price, phone, status: 'PENDING', t0: Date.now() };
-    upsertH(t); openTx(t);
+    if (mode === 'dana') {
+      const phone = normPhone($('phone').value);
+      const j = await api('/api/create-transaction', { user_id: phone, product_detail_id: picked.id, payment_method: 'qris' });
+      const d = j.data;
+      const t = { id: d.transaction_id, mode: 'dana', order: d.order_id, qrUrl: d.qr_code_url, nominal: picked.nominal, uniq: picked.kode_unik, admin: ADMIN_DANA, price: picked.price + ADMIN_DANA, phone, status: 'PENDING', t0: Date.now() };
+      upsertH(t); openTx(t);
+    } else {
+      const open = $('openAmt').checked;
+      const d = (await api('/api/qris', open ? { open: true } : { nominal: own.nominal })).data;
+      const t = { id: 'own_' + Date.now(), mode: 'own', open, payload: d.payload, merchant: d.merchant, nominal: d.nominal || 0, uniq: d.kode_unik || 0, admin: d.admin_fee || 0, price: d.total || 0, status: 'INFO', t0: Date.now() };
+      upsertH(t); openTx(t);
+    }
   } catch (e) { $('formErr').textContent = e.message; }
-  $('go').textContent = 'Generate QRIS'; validate();
+  $('go').textContent = 'Generate QRIS'; refresh();
 };
 
 /* ---------- pay view ---------- */
-function statusKind(s) {
-  s = String(s || '').toUpperCase();
+function kindOf(t) {
+  if (t.mode === 'own') return 'info';
+  const s = String(t.status || '').toUpperCase();
   if (['SUCCESS', 'PAID', 'SETTLED', 'COMPLETED', 'SETTLEMENT'].includes(s)) return 'success';
   if (['FAILED', 'EXPIRED', 'CANCELLED', 'CANCELED', 'ERROR', 'DENIED'].includes(s)) return 'fail';
   return 'pending';
 }
 function paint(t, note) {
-  const k = statusKind(t.status), b = $('stBadge');
-  b.className = 'badge st-' + k + (k !== 'pending' ? ' pop' : '');
-  b.innerHTML = k === 'success' ? '✓ Berhasil' : k === 'fail' ? '✕ Gagal' : '<span class="spin"></span>' + (note || 'Menunggu pembayaran');
-  $('chk').hidden = k !== 'pending' && !note;
+  const k = kindOf(t), b = $('stBadge');
+  b.className = 'badge st-' + k + (k === 'success' || k === 'fail' ? ' pop' : '');
+  b.textContent = ''; 
+  if (k === 'pending' && !note) { const s = document.createElement('span'); s.className = 'spin'; b.append(s); }
+  b.append(k === 'success' ? '✓ Berhasil' : k === 'fail' ? '✕ Gagal' : k === 'info' ? 'QRIS siap dibayar' : (note || 'Menunggu pembayaran'));
+  $('chk').hidden = k === 'info' || (k !== 'pending' && !note);
+}
+function showAmt(t) {
+  if (t.open) { $('pAmt').textContent = 'Nominal bebas'; $('pLabel').textContent = 'Isi nominal di aplikasi pembayar'; $('pInfo').textContent = t.merchant ? 'Ke: ' + t.merchant : ''; return; }
+  $('pLabel').textContent = 'Bayar tepat sesuai total';
+  $('pAmt').textContent = rp(t.price);
+  $('pInfo').textContent = 'Nominal ' + rp(t.nominal) + ' + kode unik ' + rp(t.uniq) + ' + admin ' + rp(t.admin || 0) +
+    (t.mode === 'dana' ? '\nDANA ' + t.phone + ' · Order ' + (t.order || '-') : (t.merchant ? '\nKe: ' + t.merchant : ''));
+}
+function drawQr(payload) {
+  if (typeof qrcode === 'undefined') throw new Error('Library QR gagal dimuat. Cek koneksi lalu coba lagi.');
+  const q = qrcode(0, 'M'); q.addData(payload); q.make();
+  const n = q.getModuleCount(), cell = Math.max(4, Math.floor(640 / (n + 8))), size = (n + 8) * cell;
+  const c = document.createElement('canvas'); c.width = c.height = size; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, size, size); x.fillStyle = '#000';
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) x.fillRect((k + 4) * cell, (r + 4) * cell, cell, cell);
+  return c.toDataURL('image/png');
 }
 function openTx(t) {
   stop(); cur = t;
   $('formView').hidden = true; $('payView').hidden = false; window.scrollTo(0, 0);
-  $('qr').hidden = false; $('qrFail').hidden = true;
-  $('qr').src = '/api/qr/' + encodeURIComponent(t.id); $('dl').href = '/api/qr/' + encodeURIComponent(t.id); $('qrLink').href = t.qrUrl;
-  $('pAmt').textContent = rp(t.price);
-  $('pInfo').innerHTML = 'Top up ' + rp(t.nominal) + ' + kode unik ' + t.uniq + '<br>DANA ' + t.phone + ' · Order ' + (t.order || '-');
-  paint(t);
-  if (statusKind(t.status) === 'pending') { check(); startPoll(t.t0 || Date.now()); }
-  else $('pTimer').textContent = '';
+  $('qr').hidden = false; $('qrFail').hidden = true; $('pTimer').textContent = '';
+  showAmt(t); paint(t);
+  if (t.mode === 'own') {
+    try { const u = drawQr(t.payload); $('qr').src = u; $('dl').href = u; $('dl').download = 'qris.png'; }
+    catch (e) { $('qr').hidden = true; $('qrFail').hidden = false; $('qrFail').textContent = e.message; }
+    $('pTimer').textContent = 'Status pembayaran dicek manual lewat notifikasi/mutasi merchant.';
+    return;
+  }
+  const src = '/api/qr/' + encodeURIComponent(t.id);
+  $('qr').src = src; $('dl').href = src; $('dl').download = 'qris.png';
+  $('qrLink').href = /^https:\/\//.test(t.qrUrl || '') ? t.qrUrl : '#';
+  if (kindOf(t) === 'pending') { check(); startPoll(t.t0 || Date.now()); }
 }
-$('qr').onerror = () => { $('qr').hidden = true; $('qrFail').hidden = false; };
+$('qr').onerror = () => { if (cur && cur.mode === 'own') return; $('qr').hidden = true; $('qrFail').hidden = false; };
+// Baca nominal asli dari isi QR (tag 54) supaya total yang tampil sama dengan yang muncul di aplikasi bayar.
+$('qr').onload = () => {
+  const t = cur; if (!t || t.mode !== 'dana' || t.decoded) return;
+  try {
+    const im = $('qr'), c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+    const x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, c.width, c.height);
+    const r = window.jsQR && jsQR(d.data, c.width, c.height); const a = r && parseFloat(emv(r.data)['54']);
+    if (a > 0) { t.decoded = true; t.price = Math.round(a); t.uniq = Math.max(0, t.price - t.nominal - (t.admin || 0)); upsertH(t); showAmt(t); }
+  } catch {}
+};
 function startPoll(t0) {
   const end = t0 + MAX_WAIT;
   tickT = setInterval(() => {
@@ -238,30 +335,52 @@ function startPoll(t0) {
 }
 function stop() { clearInterval(pollT); clearInterval(tickT); pollT = tickT = null; }
 async function check() {
-  if (!cur) return;
-  const id = cur.id;
+  if (!cur || cur.mode !== 'dana') return;
+  const t = cur;
   try {
-    const j = await api('/api/check-transaction', { transaction_id: id });
-    if (!cur || cur.id !== id) return;
-    cur.status = j.data.status || 'PENDING'; upsertH(cur);
-    if (statusKind(cur.status) !== 'pending') { stop(); $('pTimer').textContent = j.data.paid_at ? 'Dibayar: ' + j.data.paid_at : ''; }
-    paint(cur);
-  } catch (e) { /* jaringan/provider sibuk: coba lagi di polling berikutnya */ }
+    const j = await api('/api/check-transaction', { transaction_id: t.id });
+    if (cur !== t) return;
+    t.status = j.data.status || 'PENDING'; upsertH(t);
+    if (kindOf(t) !== 'pending') { stop(); $('pTimer').textContent = j.data.paid_at ? 'Dibayar: ' + j.data.paid_at : ''; }
+    paint(t);
+  } catch {}
 }
-$('chk').onclick = () => { const t0 = cur && statusKind(cur.status) === 'pending' && !pollT ? Date.now() : null; if (t0) { cur.t0 = t0; paint(cur); startPoll(t0); } check(); };
+$('chk').onclick = () => { if (cur && kindOf(cur) === 'pending' && !pollT) { cur.t0 = Date.now(); paint(cur); startPoll(cur.t0); } check(); };
 $('again').onclick = () => { stop(); cur = null; $('payView').hidden = true; $('formView').hidden = false; window.scrollTo(0, 0); };
 
-/* ---------- history ---------- */
+/* ---------- history, backup, restore ---------- */
 function renderH() {
-  const h = loadH(), box = $('histList'); $('histCard').hidden = !h.length; box.innerHTML = '';
+  const h = loadH(), box = $('histList'); $('histCard').hidden = !h.length; $('histN').textContent = h.length; box.textContent = '';
   h.forEach(t => {
-    const k = statusKind(t.status), b = document.createElement('button');
-    b.className = 'hist';
-    b.innerHTML = '<span><b>' + rp(t.price) + '</b><em>' + t.phone + '</em></span><span class="badge st-' + k + '">' + (k === 'success' ? 'Berhasil' : k === 'fail' ? 'Gagal' : 'Menunggu') + '</span>';
-    b.onclick = () => openTx(t);
-    box.appendChild(b);
+    const k = kindOf(t), b = document.createElement('button'); b.className = 'hist';
+    const l = document.createElement('span'), s = document.createElement('b'), em = document.createElement('em');
+    s.textContent = t.mode === 'own' && t.open ? 'Tanpa nominal' : rp(t.price);
+    em.textContent = (t.mode === 'own' ? 'QRIS langsung' : 'DANA ' + (t.phone || '')) + ' · ' + new Date(t.t0 || 0).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' });
+    l.append(s, em);
+    const bd = document.createElement('span'); bd.className = 'badge st-' + k; bd.textContent = { success: 'Berhasil', fail: 'Gagal', pending: 'Menunggu', info: 'QRIS' }[k];
+    b.append(l, bd); b.onclick = () => openTx(t); box.appendChild(b);
   });
 }
+$('bk').onclick = () => {
+  const blob = new Blob([JSON.stringify({ v: 1, items: loadH() }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'riwayat-qris-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+  $('histNote').className = 'hint'; $('histNote').textContent = 'Backup diunduh.';
+};
+$('rsBtn').onclick = () => $('rs').click();
+$('rs').onchange = async e => {
+  const f = e.target.files[0], n = $('histNote'); if (!f) return;
+  try {
+    const j = JSON.parse(await f.text()), arr = Array.isArray(j) ? j : j.items;
+    if (!Array.isArray(arr)) throw 0;
+    const ok = arr.filter(x => x && typeof x.id === 'string' && Number.isFinite(+x.price) && Number.isFinite(+x.t0));
+    const m = new Map(loadH().map(x => [x.id, x])); let add = 0;
+    ok.forEach(x => { if (!m.has(x.id)) { m.set(x.id, x); add++; } });
+    saveH([...m.values()].sort((a, b) => b.t0 - a.t0)); renderH();
+    n.className = 'hint'; n.textContent = 'Restore selesai: ' + add + ' data baru ditambahkan.';
+  } catch { n.className = 'hint err'; n.textContent = 'File backup tidak valid.'; }
+  e.target.value = '';
+};
 init();
 </script>
 </body>
