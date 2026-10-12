@@ -17,3 +17,7 @@ Important:
 - Do not put API secrets in frontend JavaScript.
 - The existing upstream Origin/Referer headers were preserved from your original project; confirm with the seller that this integration is authorized.
 - Product prices are resolved server-side from products.json rather than trusted from the browser.
+
+Update 1.1.0:
+- / now serves the QRIS website (web/index.html). API info moved to /api.
+- New: /api/catalog, /api/qr/:id (QR image proxy). vercel.json includes web/** in the function bundle.

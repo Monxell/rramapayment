@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QRIS Generator · Top Up DANA</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF4E0;--ink:#1E1B2E;--card:#fff;--lav:#CDBBFF;--mint:#B6F0CF;--peach:#FFCBA8;--yel:#FFE48A;--pink:#FFB7D0;--sh:4px 4px 0 var(--ink)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:18px 14px 40px;background-image:radial-gradient(var(--ink) 1px,transparent 1px);background-size:22px 22px;background-position:0 0}
+.wrap{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:20px;box-shadow:var(--sh);padding:16px}
+h1{font-size:26px;line-height:1.1}
+.tag{display:inline-block;background:var(--lav);border:2px solid var(--ink);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:8px}
+.sub{font-size:14px;margin-top:6px;opacity:.8}
+label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+.step{display:inline-grid;place-items:center;width:24px;height:24px;border:2px solid var(--ink);border-radius:8px;background:var(--yel);font-size:13px;margin-right:6px}
+input{width:100%;font:inherit;font-weight:700;font-size:17px;padding:12px 14px;border:2.5px solid var(--ink);border-radius:14px;background:#fff;outline:none;box-shadow:3px 3px 0 var(--ink)}
+input:focus{background:#FFFBEF}
+.hint{font-size:12.5px;margin-top:8px;min-height:16px}
+.hint.err{color:#B3123F;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.chip{font:inherit;font-weight:700;font-size:15px;padding:10px 4px 8px;border:2.5px solid var(--ink);border-radius:14px;background:var(--peach);box-shadow:3px 3px 0 var(--ink);cursor:pointer;text-align:center;line-height:1.2;color:var(--ink);transition:transform .08s,box-shadow .08s}
+.chip small{display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px}
+.chip.low small{opacity:1;font-weight:700}
+.chip:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.chip.on{background:var(--lav);transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:6px 0}
+.row b{font-family:'Space Mono',monospace}
+.total{border-top:2.5px dashed var(--ink);margin-top:6px;padding-top:12px;font-size:17px}
+.total b{font-size:22px}
+.btn{width:100%;font:inherit;font-weight:700;font-size:17px;padding:14px;border:2.5px solid var(--ink);border-radius:16px;background:var(--mint);box-shadow:var(--sh);cursor:pointer;color:var(--ink);transition:transform .08s,box-shadow .08s;text-align:center;text-decoration:none;display:block}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn.alt{background:#fff;font-size:15px;padding:11px;box-shadow:3px 3px 0 var(--ink)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.badge{display:inline-block;border:2.5px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700;font-size:15px}
+.st-pending{background:var(--yel)}.st-success{background:var(--mint)}.st-fail{background:var(--pink)}
+.center{text-align:center}
+.qr{width:100%;max-width:290px;aspect-ratio:1;object-fit:contain;margin:14px auto;display:block;background:#fff;border:2.5px solid var(--ink);border-radius:18px;padding:8px}
+.amount{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;margin-top:10px}
+.meta{font-size:12.5px;opacity:.75;margin-top:6px;word-break:break-all}
+.hist{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;font:inherit;text-align:left;border:2px solid var(--ink);border-radius:12px;background:#fff;padding:9px 12px;margin-top:8px;cursor:pointer;color:var(--ink)}
+.hist .badge{padding:2px 10px;font-size:12px;border-width:2px}
+.hist span:first-child{font-size:14px}
+.hist em{display:block;font-style:normal;font-size:11.5px;opacity:.65}
+.spin{display:inline-block;width:14px;height:14px;border:3px solid var(--ink);border-top-color:transparent;border-radius:50%;animation:s .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes s{to{transform:rotate(360deg)}}
+.pop{animation:p .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes p{from{transform:scale(.6);opacity:0}}
+[hidden]{display:none!important}
+.foot{font-size:12px;text-align:center;opacity:.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="card" style="background:var(--lav)">
+    <span class="tag" style="background:#fff">QRIS · TOP UP DANA</span>
+    <h1>Generate QRIS<br>langsung bayar.</h1>
+    <p class="sub">Pilih nominal, scan, selesai. Tanpa login, tanpa admin.</p>
+  </header>
+
+  <!-- FORM -->
+  <section id="formView" class="wrap" style="gap:16px">
+    <div class="card">
+      <label><span class="step">1</span>Nomor DANA tujuan</label>
+      <input id="phone" type="tel" inputmode="numeric" placeholder="08xxxxxxxxxx" autocomplete="tel" maxlength="16">
+      <div id="phoneHint" class="hint">Saldo DANA akan masuk ke nomor ini.</div>
+    </div>
+
+    <div class="card">
+      <label><span class="step">2</span>Pilih nominal</label>
+      <div id="chips" class="grid"><div class="hint" style="grid-column:1/-1"><span class="spin"></span>Memuat nominal…</div></div>
+      <label style="margin-top:16px">Atau nominal custom</label>
+      <input id="custom" type="text" inputmode="numeric" placeholder="contoh: 10.000">
+      <div id="customHint" class="hint"></div>
+    </div>
+
+    <div class="card" id="sumCard" hidden>
+      <div class="row"><span>Nominal</span><b id="sNom">-</b></div>
+      <div class="row"><span>Kode unik</span><b id="sUni">-</b></div>
+      <div class="row total"><span>Total bayar</span><b id="sTot">-</b></div>
+    </div>
+
+    <button id="go" class="btn" disabled>Generate QRIS</button>
+    <div id="formErr" class="hint err center"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="payView" class="card center" hidden>
+    <span id="stBadge" class="badge st-pending"></span>
+    <img id="qr" class="qr" alt="QRIS">
+    <div id="qrFail" class="hint err" hidden>Gambar QR gagal dimuat. <a id="qrLink" target="_blank" rel="noopener">Buka QR langsung</a></div>
+    <div class="hint">Bayar tepat sesuai total</div>
+    <div id="pAmt" class="amount">-</div>
+    <div id="pInfo" class="meta"></div>
+    <div id="pTimer" class="meta"></div>
+    <div class="btns">
+      <button id="chk" class="btn alt">Cek status</button>
+      <a id="dl" class="btn alt" download="qris.png">Simpan QR</a>
+    </div>
+    <button id="again" class="btn" style="margin-top:14px;background:var(--peach)">Buat transaksi baru</button>
+  </section>
+
+  <section id="histCard" class="card" hidden>
+    <label style="margin-bottom:0">Riwayat terakhir</label>
+    <div id="histList"></div>
+  </section>
+
+  <p class="foot">Top up saldo DANA via QRIS · bayar sesuai total agar terdeteksi</p>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const rp = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+const POLL_MS = 8000, MAX_WAIT = 5 * 60 * 1000, KEY = 'qris_hist_v1';
+let catalog = [], picked = null, cur = null, pollT = null, tickT = null;
+
+/* ---------- storage ---------- */
+const loadH = () => { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } };
+const saveH = h => { try { localStorage.setItem(KEY, JSON.stringify(h.slice(0, 5))); } catch {} };
+function upsertH(t) { const h = loadH().filter(x => x.id !== t.id); h.unshift(t); saveH(h); renderH(); }
+
+/* ---------- api ---------- */
+async function api(path, body) {
+  const r = await fetch(path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : undefined);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.success) throw new Error(j.message || 'Terjadi kesalahan. Coba lagi.');
+  return j;
+}
+
+/* ---------- catalog / chips ---------- */
+async function init() {
+  try { catalog = (await api('/api/catalog')).data; drawChips(); }
+  catch (e) { $('chips').innerHTML = '<div class="hint err" style="grid-column:1/-1">' + e.message + '</div>'; }
+  renderH();
+}
+function drawChips() {
+  $('chips').innerHTML = '';
+  catalog.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (p.kode_unik < 200 ? ' low' : '');
+    b.dataset.id = p.id;
+    b.innerHTML = (p.nominal / 1000) + 'k<small>+' + p.kode_unik + '</small>';
+    b.onclick = () => { $('custom').value = ''; $('customHint').textContent = ''; pick(p); };
+    $('chips').appendChild(b);
+  });
+}
+function pick(p) {
+  picked = p;
+  document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', p && Number(c.dataset.id) === p.id));
+  $('sumCard').hidden = !p;
+  if (p) { $('sNom').textContent = rp(p.nominal); $('sUni').textContent = rp(p.kode_unik); $('sTot').textContent = rp(p.price); }
+  validate();
+}
+
+/* ---------- custom nominal ---------- */
+$('custom').addEventListener('input', e => {
+  const n = parseInt(e.target.value.replace(/\D/g, ''), 10) || 0;
+  e.target.value = n ? n.toLocaleString('id-ID') : '';
+  const h = $('customHint'); h.className = 'hint';
+  if (!n) { h.textContent = ''; return pick(null); }
+  const hit = catalog.find(p => p.nominal === n);
+  if (hit) { h.textContent = 'Nominal tersedia ✓'; return pick(hit); }
+  pick(null);
+  const near = [...catalog].sort((a, b) => Math.abs(a.nominal - n) - Math.abs(b.nominal - n)).slice(0, 2).sort((a, b) => a.nominal - b.nominal);
+  h.className = 'hint err';
+  h.innerHTML = 'Nominal ini belum tersedia. Terdekat: ' + near.map(p => '<a href="#" data-n="' + p.nominal + '" style="color:inherit">' + rp(p.nominal) + '</a>').join(' atau ');
+  h.querySelectorAll('a').forEach(a => a.onclick = ev => {
+    ev.preventDefault(); const p = catalog.find(x => x.nominal === +a.dataset.n);
+    $('custom').value = p.nominal.toLocaleString('id-ID'); h.className = 'hint'; h.textContent = 'Nominal tersedia ✓'; pick(p);
+  });
+});
+
+/* ---------- phone ---------- */
+function normPhone(v) {
+  let d = v.replace(/\D/g, '');
+  if (d.startsWith('62')) d = '0' + d.slice(2);
+  return /^08\d{8,12}$/.test(d) ? d : null;
+}
+$('phone').addEventListener('input', () => {
+  const v = $('phone').value, h = $('phoneHint');
+  if (!v) { h.className = 'hint'; h.textContent = 'Saldo DANA akan masuk ke nomor ini.'; }
+  else if (normPhone(v)) { h.className = 'hint'; h.textContent = 'Nomor valid ✓'; }
+  else { h.className = 'hint err'; h.textContent = 'Format nomor belum benar (contoh 08123456789).'; }
+  validate();
+});
+const validate = () => { $('go').disabled = !(picked && normPhone($('phone').value)); };
+
+/* ---------- create ---------- */
+$('go').onclick = async () => {
+  $('formErr').textContent = ''; $('go').disabled = true; $('go').innerHTML = '<span class="spin"></span>Membuat QRIS…';
+  try {
+    const phone = normPhone($('phone').value);
+    const j = await api('/api/create-transaction', { user_id: phone, product_detail_id: picked.id, payment_method: 'qris' });
+    const d = j.data;
+    const t = { id: d.transaction_id, order: d.order_id, qrUrl: d.qr_code_url, nominal: picked.nominal, uniq: picked.kode_unik, price: picked.price, phone, status: 'PENDING', t0: Date.now() };
+    upsertH(t); openTx(t);
+  } catch (e) { $('formErr').textContent = e.message; }
+  $('go').textContent = 'Generate QRIS'; validate();
+};
+
+/* ---------- pay view ---------- */
+function statusKind(s) {
+  s = String(s || '').toUpperCase();
+  if (['SUCCESS', 'PAID', 'SETTLED', 'COMPLETED', 'SETTLEMENT'].includes(s)) return 'success';
+  if (['FAILED', 'EXPIRED', 'CANCELLED', 'CANCELED', 'ERROR', 'DENIED'].includes(s)) return 'fail';
+  return 'pending';
+}
+function paint(t, note) {
+  const k = statusKind(t.status), b = $('stBadge');
+  b.className = 'badge st-' + k + (k !== 'pending' ? ' pop' : '');
+  b.innerHTML = k === 'success' ? '✓ Berhasil' : k === 'fail' ? '✕ Gagal' : '<span class="spin"></span>' + (note || 'Menunggu pembayaran');
+  $('chk').hidden = k !== 'pending' && !note;
+}
+function openTx(t) {
+  stop(); cur = t;
+  $('formView').hidden = true; $('payView').hidden = false; window.scrollTo(0, 0);
+  $('qr').hidden = false; $('qrFail').hidden = true;
+  $('qr').src = '/api/qr/' + encodeURIComponent(t.id); $('dl').href = '/api/qr/' + encodeURIComponent(t.id); $('qrLink').href = t.qrUrl;
+  $('pAmt').textContent = rp(t.price);
+  $('pInfo').innerHTML = 'Top up ' + rp(t.nominal) + ' + kode unik ' + t.uniq + '<br>DANA ' + t.phone + ' · Order ' + (t.order || '-');
+  paint(t);
+  if (statusKind(t.status) === 'pending') { check(); startPoll(t.t0 || Date.now()); }
+  else $('pTimer').textContent = '';
+}
+$('qr').onerror = () => { $('qr').hidden = true; $('qrFail').hidden = false; };
+function startPoll(t0) {
+  const end = t0 + MAX_WAIT;
+  tickT = setInterval(() => {
+    const left = end - Date.now();
+    if (left <= 0) { stop(); $('pTimer').textContent = ''; paint(cur, 'Waktu tunggu habis'); return; }
+    $('pTimer').textContent = 'Auto-cek sisa ' + Math.floor(left / 60000) + ':' + String(Math.floor(left / 1000) % 60).padStart(2, '0');
+  }, 1000);
+  pollT = setInterval(check, POLL_MS);
+}
+function stop() { clearInterval(pollT); clearInterval(tickT); pollT = tickT = null; }
+async function check() {
+  if (!cur) return;
+  const id = cur.id;
+  try {
+    const j = await api('/api/check-transaction', { transaction_id: id });
+    if (!cur || cur.id !== id) return;
+    cur.status = j.data.status || 'PENDING'; upsertH(cur);
+    if (statusKind(cur.status) !== 'pending') { stop(); $('pTimer').textContent = j.data.paid_at ? 'Dibayar: ' + j.data.paid_at : ''; }
+    paint(cur);
+  } catch (e) { /* jaringan/provider sibuk: coba lagi di polling berikutnya */ }
+}
+$('chk').onclick = () => { const t0 = cur && statusKind(cur.status) === 'pending' && !pollT ? Date.now() : null; if (t0) { cur.t0 = t0; paint(cur); startPoll(t0); } check(); };
+$('again').onclick = () => { stop(); cur = null; $('payView').hidden = true; $('formView').hidden = false; window.scrollTo(0, 0); };
+
+/* ---------- history ---------- */
+function renderH() {
+  const h = loadH(), box = $('histList'); $('histCard').hidden = !h.length; box.innerHTML = '';
+  h.forEach(t => {
+    const k = statusKind(t.status), b = document.createElement('button');
+    b.className = 'hist';
+    b.innerHTML = '<span><b>' + rp(t.price) + '</b><em>' + t.phone + '</em></span><span class="badge st-' + k + '">' + (k === 'success' ? 'Berhasil' : k === 'fail' ? 'Gagal' : 'Menunggu') + '</span>';
+    b.onclick = () => openTx(t);
+    box.appendChild(b);
+  });
+}
+init();
+</script>
+</body>
+</html>

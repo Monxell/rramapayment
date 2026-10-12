@@ -1,6 +1,6 @@
 {
   "name": "payment-gateway-api",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Payment Gateway API adapted for Vercel serverless deployment",
   "main": "index.js",
   "scripts": {

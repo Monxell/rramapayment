@@ -43,10 +43,16 @@ function allProducts() {
 }
 
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'web', 'index.html'), error => {
+    if (error && !res.headersSent) res.status(404).send('Website file not found.');
+  });
+});
+
+app.get('/api', (req, res) => {
   res.json({
     success: true,
     message: 'Payment Gateway API is running',
-    endpoints: ['/api/products', '/api/create-transaction', '/api/check-transaction', '/docs']
+    endpoints: ['/api/products', '/api/catalog', '/api/create-transaction', '/api/check-transaction', '/api/qr/:id', '/docs']
   });
 });
 
@@ -54,11 +60,65 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, status: 'ok' });
 });
 
+const hits = new Map();
+function rateLimit(max, windowMs) {
+  return (req, res, next) => {
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const now = Date.now();
+    const recent = (hits.get(ip) || []).filter(t => now - t < windowMs);
+    if (recent.length >= max) {
+      return res.status(429).json({ success: false, message: 'Terlalu banyak permintaan. Coba lagi beberapa menit lagi.' });
+    }
+    recent.push(now);
+    hits.set(ip, recent);
+    if (hits.size > 5000) hits.clear();
+    next();
+  };
+}
+
+function nominalOf(product) {
+  const n = parseInt(String(product.name).replace(/\D/g, ''), 10);
+  return Number.isFinite(n) ? n * 1000 : null;
+}
+
+// One entry per nominal (cheapest product wins), with kode_unik = price - nominal.
+app.get('/api/catalog', (req, res) => {
+  const best = new Map();
+  for (const p of allProducts()) {
+    const nominal = nominalOf(p);
+    if (!nominal || p.price < nominal) continue;
+    const cur = best.get(nominal);
+    if (!cur || p.price < cur.price) {
+      best.set(nominal, { id: p.id, nominal, price: p.price, kode_unik: p.price - nominal });
+    }
+  }
+  res.json({ success: true, data: [...best.values()].sort((a, b) => a.nominal - b.nominal) });
+});
+
+app.get('/api/qr/:id', async (req, res) => {
+  const id = req.params.id;
+  if (!/^pay_[A-Za-z0-9_-]{4,64}$/.test(id)) {
+    return res.status(400).json({ success: false, message: 'Invalid transaction id.' });
+  }
+  try {
+    const r = await upstream.get('/payments/qr/' + encodeURIComponent(id), {
+      responseType: 'arraybuffer',
+      headers: { Accept: 'image/*,*/*' }
+    });
+    res.set('Content-Type', r.headers['content-type'] || 'image/png');
+    res.set('Cache-Control', 'private, max-age=300');
+    return res.send(Buffer.from(r.data));
+  } catch (error) {
+    console.error('Error fetching QR:', error.message);
+    return res.status(502).json({ success: false, message: 'Failed to load QR image.' });
+  }
+});
+
 app.get('/api/products', (req, res) => {
   res.json({ success: true, data: productsDb });
 });
 
-app.post('/api/create-transaction', async (req, res) => {
+app.post('/api/create-transaction', rateLimit(8, 10 * 60 * 1000), async (req, res) => {
   try {
     const {
       user_id,
@@ -120,7 +180,12 @@ app.post('/api/create-transaction', async (req, res) => {
       });
     }
 
-    return res.json({ success: true, data: responseData });
+    const nominal = nominalOf(product);
+    return res.json({
+      success: true,
+      data: responseData,
+      amount: { nominal, price: product.price, kode_unik: nominal ? product.price - nominal : null }
+    });
   } catch (error) {
     console.error('Error creating transaction:', {
       message: error.message,
