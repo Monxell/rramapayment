@@ -6,7 +6,7 @@
 <title>QRIS Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#FFF4E0;--ink:#1E1B2E;--lav:#CDBBFF;--mint:#B6F0CF;--peach:#FFCBA8;--yel:#FFE48A;--pink:#FFB7D0;--sh:4px 4px 0 var(--ink)}
+:root{--bg:#FFF4E0;--ink:#1E1B2E;--lav:#CDBBFF;--mint:#B6F0CF;--peach:#FFCBA8;--yel:#FFE48A;--pink:#FFB7D0;--sh:4px 4px 0 var(--ink);--chip:#BDE3FF}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{width:100%}
 body{font-family:'Space Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px 12px 40px;background-image:radial-gradient(var(--ink) 1px,transparent 1px);background-size:22px 22px}
@@ -26,9 +26,12 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
 .tab{font:inherit;font-weight:700;font-size:15px;padding:11px 6px;border:2.5px solid var(--ink);border-radius:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink)}
 .tab.on{background:var(--yel);transform:translate(3px,3px);box-shadow:none}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.chip{font:inherit;font-weight:700;font-size:15px;padding:12px 2px;border:2.5px solid var(--ink);border-radius:14px;background:var(--peach);box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);transition:transform .08s,box-shadow .08s}
+.chip{font:inherit;font-weight:700;font-size:15px;padding:12px 2px;border:2.5px solid var(--ink);border-radius:14px;background:var(--chip);box-shadow:3px 3px 0 var(--ink);cursor:pointer;color:var(--ink);transition:transform .08s,box-shadow .08s}
 .chip:active,.chip.on{transform:translate(3px,3px);box-shadow:none}
-.chip.on{background:var(--lav)}
+.chip.on{background:var(--yel)}
+.ct{display:inline-flex;border:2px solid var(--ink);border-radius:12px;background:var(--mint);overflow:hidden;box-shadow:2px 2px 0 var(--ink)}
+.ctb,.ctx{font:inherit;font-weight:700;font-size:13px;padding:7px 10px;background:none;border:none;cursor:pointer;color:var(--ink)}
+.ctx{border-left:2px solid var(--ink);padding:7px 9px}
 .row{display:flex;justify-content:space-between;gap:10px;font-size:15px;padding:6px 0}
 .row b{font-family:'Space Mono',monospace;text-align:right}
 .total{border-top:2.5px dashed var(--ink);margin-top:6px;padding-top:12px;font-size:17px}
@@ -73,14 +76,16 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
       <div class="card">
         <label><span class="step">1</span>Nomor DANA tujuan</label>
         <input id="phone" type="tel" inputmode="numeric" placeholder="08xxxxxxxxxx" autocomplete="tel" maxlength="16">
-        <div id="phoneHint" class="hint">Saldo DANA akan masuk ke nomor ini.</div>
+        \1
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input id="cLabel" type="text" placeholder="Label (opsional)" maxlength="24" style="font-size:14px;padding:9px 12px">
+          <button id="cSave" class="btn alt" style="width:auto;padding:9px 14px;white-space:nowrap">💾 Simpan</button>
+        </div>
+        <div id="cList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
       </div>
       <div class="card">
         <label><span class="step">2</span>Pilih nominal</label>
         <div id="chips" class="grid"><div class="hint" style="grid-column:1/-1"><span class="spin"></span>Memuat…</div></div>
-        <label style="margin-top:16px">Atau nominal custom</label>
-        <input id="custom" type="text" inputmode="numeric" placeholder="contoh: 10.000">
-        <div id="customHint" class="hint"></div>
       </div>
     </div>
 
@@ -109,7 +114,7 @@ input:focus{background:#FFFBEF}input:disabled{opacity:.45}
     <button id="again" class="btn" style="margin-top:14px;background:var(--peach)">Buat transaksi baru</button>
   </section>
 
-  <section id="histCard" class="card" hidden>
+  <section id="histCard" class="card">
     <label>Riwayat (<span id="histN">0</span>)</label>
     <div class="btns" style="margin:0 0 6px">
       <button class="btn alt" id="bk">⬇ Backup</button>
@@ -154,30 +159,34 @@ function refresh() {
 async function init() {
   try { catalog = (await api('/api/catalog')).data; drawChips(); }
   catch (e) { $('chips').innerHTML = '<div class="hint err" style="grid-column:1/-1">' + e.message + '</div>'; }
-  renderH();
+  renderH(); renderC();
 }
 function chipBtn(label, on, fn) { const b = document.createElement('button'); b.className = 'chip'; b.textContent = label; b.onclick = fn; return b; }
 function drawChips() {
   $('chips').innerHTML = '';
-  catalog.forEach(p => { const b = chipBtn(p.nominal / 1000 + 'k', 0, () => { $('custom').value = ''; $('customHint').textContent = ''; pick(p); }); b.dataset.id = p.id; $('chips').appendChild(b); });
+  catalog.forEach(p => { const b = chipBtn(p.nominal / 1000 + 'k', 0, () => pick(p)); b.dataset.id = p.id; $('chips').appendChild(b); });
 }
 function pick(p) { picked = p; document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('on', !!p && +c.dataset.id === p.id)); refresh(); }
-$('custom').addEventListener('input', e => {
-  const n = fmtNum(e.target), h = $('customHint'); h.className = 'hint';
-  if (!n) { h.textContent = ''; return pick(null); }
-  if (n < 1000) { pick(null); h.className = 'hint err'; h.textContent = 'Minimal Rp 1.000.'; return; }
-  const hit = catalog.find(p => p.nominal === n);
-  if (hit) { h.textContent = 'Nominal tersedia ✓'; return pick(hit); }
-  pick(null);
-  const near = [...catalog].sort((a, b) => Math.abs(a.nominal - n) - Math.abs(b.nominal - n)).slice(0, 2).sort((a, b) => a.nominal - b.nominal);
-  h.className = 'hint err'; h.textContent = 'Nominal ini belum tersedia. Terdekat: ';
-  near.forEach((p, i) => {
-    if (i) h.append(' atau ');
-    const a = document.createElement('a'); a.href = '#'; a.style.color = 'inherit'; a.textContent = rp(p.nominal);
-    a.onclick = ev => { ev.preventDefault(); $('custom').value = p.nominal.toLocaleString('id-ID'); h.className = 'hint'; h.textContent = 'Nominal tersedia ✓'; pick(p); };
-    h.append(a);
+const CKEY = 'qris_contacts_v1';
+const loadC = () => { try { const a = JSON.parse(localStorage.getItem(CKEY)); return Array.isArray(a) ? a : []; } catch { return []; } };
+const saveC = c => { try { localStorage.setItem(CKEY, JSON.stringify(c.slice(0, 100))); } catch {} };
+function renderC() {
+  const box = $('cList'); box.textContent = '';
+  loadC().forEach(c => {
+    const w = document.createElement('span'); w.className = 'ct';
+    const b = document.createElement('button'); b.className = 'ctb'; b.textContent = (c.label ? c.label + ' · ' : '') + c.phone;
+    b.onclick = () => { $('phone').value = c.phone; $('phone').dispatchEvent(new Event('input')); };
+    const x = document.createElement('button'); x.className = 'ctx'; x.textContent = '×'; x.setAttribute('aria-label', 'Hapus nomor');
+    x.onclick = () => { saveC(loadC().filter(y => y.phone !== c.phone)); renderC(); };
+    w.append(b, x); box.appendChild(w);
   });
-});
+}
+$('cSave').onclick = () => {
+  const p = normPhone($('phone').value), h = $('phoneHint');
+  if (!p) { h.className = 'hint err'; h.textContent = 'Isi nomor yang valid dulu.'; return; }
+  const c = loadC().filter(y => y.phone !== p); c.unshift({ phone: p, label: $('cLabel').value.trim().slice(0, 24) });
+  saveC(c); renderC(); $('cLabel').value = ''; h.className = 'hint'; h.textContent = 'Nomor tersimpan ✓';
+};
 function normPhone(v) { let d = v.replace(/\D/g, ''); if (d.startsWith('62')) d = '0' + d.slice(2); return /^08\d{8,12}$/.test(d) ? d : null; }
 $('phone').addEventListener('input', () => {
   const v = $('phone').value, h = $('phoneHint');
@@ -270,7 +279,8 @@ $('again').onclick = () => { stop(); cur = null; $('payView').hidden = true; $('
 
 /* ---------- history, backup, restore ---------- */
 function renderH() {
-  const h = loadH().filter(t => t.mode !== 'own'), box = $('histList'); $('histCard').hidden = !h.length; $('histN').textContent = h.length; box.textContent = '';
+  const h = loadH().filter(t => t.mode !== 'own'), box = $('histList'); $('histN').textContent = h.length; box.textContent = '';
+  if (!h.length) { const e = document.createElement('div'); e.className = 'hint'; e.textContent = 'Belum ada riwayat.'; box.appendChild(e); }
   h.forEach(t => {
     const k = kindOf(t), b = document.createElement('button'); b.className = 'hist';
     const l = document.createElement('span'), s = document.createElement('b'), em = document.createElement('em');
@@ -282,7 +292,7 @@ function renderH() {
   });
 }
 $('bk').onclick = () => {
-  const blob = new Blob([JSON.stringify({ v: 1, items: loadH() }, null, 1)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ v: 2, items: loadH(), contacts: loadC() }, null, 1)], { type: 'application/json' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'riwayat-qris-' + new Date().toISOString().slice(0, 10) + '.json';
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 3000);
   $('histNote').className = 'hint'; $('histNote').textContent = 'Backup diunduh.';
@@ -297,7 +307,9 @@ $('rs').onchange = async e => {
     const m = new Map(loadH().map(x => [x.id, x])); let add = 0;
     ok.forEach(x => { if (!m.has(x.id)) { m.set(x.id, x); add++; } });
     saveH([...m.values()].sort((a, b) => b.t0 - a.t0)); renderH();
-    n.className = 'hint'; n.textContent = 'Restore selesai: ' + add + ' data baru ditambahkan.';
+    const cs = Array.isArray(j.contacts) ? j.contacts.filter(c => c && /^08\d{8,12}$/.test(String(c.phone))).map(c => ({ phone: String(c.phone), label: String(c.label || '').slice(0, 24) })) : [];
+    const have = new Set(loadC().map(c => c.phone)); saveC(loadC().concat(cs.filter(c => !have.has(c.phone)))); renderC();
+    n.className = 'hint'; n.textContent = 'Restore selesai: ' + add + ' transaksi baru, ' + cs.filter(c => !have.has(c.phone)).length + ' nomor baru.';
   } catch { n.className = 'hint err'; n.textContent = 'File backup tidak valid.'; }
   e.target.value = '';
 };
